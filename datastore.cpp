@@ -5,11 +5,11 @@ dataStore::dataStore(QObject *parent) : QObject(parent)
 
 }
 
-void dataStore::appendNode(nodeAddresses node) {
+void dataStore::nodeAppend(nodeAddresses node) {
     na.append(node);
 }
 
-void dataStore::removeNode(nodeAddresses node) {
+void dataStore::nodeRemove(nodeAddresses node) {
     int i = 0;
 
     // Improve this so that it is done internally by Qt
@@ -22,3 +22,44 @@ void dataStore::removeNode(nodeAddresses node) {
         i++;
     }
 }
+
+// Update nodes with keep alive data
+void dataStore::nodeUpdate(nodeAddresses node) {
+
+}
+
+// Add Task
+void dataStore::taskAppend() {
+
+}
+
+// Remove Task
+void dataStore::taskRemove() {
+
+}
+
+// Update Task
+void dataStore::taskGetQueuePosition() {
+
+}
+
+// Job: Append
+void dataStore::jobAppend() {
+
+}
+
+// Job: Remove
+void dataStore::jobRemove() {
+
+}
+
+// Job: Update Job List with Queue Position from remote Node
+void dataStore::jobUpdate() {
+
+}
+
+// Job: Next available frame for scheduling
+void dataStore::jobGetNextFrame() {
+
+}
+

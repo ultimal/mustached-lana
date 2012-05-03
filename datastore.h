@@ -16,14 +16,16 @@ struct frameListType {
 };
 
 struct jobListType {
+    nodeAddresses node;
     QString blenderFile;
     double totalFrames, completedFrames;
     int percentComplete;
 };
 
 struct taskListType {
-    QString blenderFile,
-    double totalFrames, completed
+    nodeAddresses node;
+    QString blenderFile;
+    double frameNumber;
 };
 
 class dataStore : public QObject
@@ -42,14 +44,15 @@ public:
 signals:
     
 public slots:
+
     // Used by connection to append a new Node to the data store
-    void appendNode(nodeAddresses node);
+    void nodeAppend(nodeAddresses node);
 
     // Used by node manager to remove dead nodes from the data store
-    void removeNode(nodeAddresses node);
+    void nodeRemove(nodeAddresses node);
 
     // Update nodes with keep alive data
-    void updateNode(nodeAddresses node);
+    void nodeUpdate(nodeAddresses node);
 
     // Add Task
     void taskAppend();
@@ -71,8 +74,6 @@ public slots:
 
     // Job: Next available frame for scheduling
     void jobGetNextFrame();
-
-
 
 private:
     QVector<nodeAddresses> na;

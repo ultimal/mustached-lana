@@ -11,7 +11,7 @@ class node : public QObject
 {
     Q_OBJECT
 public:
-    explicit node(QObject *parent = 0,  QString nodePort = "666", nodeAddresses nodeA, bool d = false);
+    explicit node(QObject *parent=0, QString nodePort="666", dataStore *ds=0, nodeAddresses nodeA=nodeAddresses(), bool d=false );
     
     enum operations {
         NONE,
@@ -25,6 +25,8 @@ public slots:
     void disconnected();
     void bytesWritten( qint64 bytes);
     void readyRead();
+    void sendBlenderFile(QString filename, nodeAddresses node);
+    void sendRenderedImage (QString filename);
 
 private:
     QTcpSocket *socket;
@@ -32,6 +34,7 @@ private:
     QString np;
     int currentOperation;
     bool debug;
+    dataStore *ds;
 };
 
 #endif // NODE_H

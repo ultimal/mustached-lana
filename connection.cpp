@@ -28,7 +28,7 @@ void Connection::processReadyRead() {
         // Waiting for port number from the node
         if (currentOperation==REGISTER) {
             newNode.port = this->readAll();
-            ds->appendNode(newNode);
+            ds->nodeAppend(newNode);
             currentOperation==NONE;
         }
         if (currentOperation==DB) {sendDB();}
@@ -74,6 +74,7 @@ QDataStream &operator <<(QDataStream &stream, const nodeAddresses &myclass)
 {
     stream << myclass.ipAddress;
     stream << myclass.port;
+    stream << myclass.keepAlive;
     return stream;
 }
 
@@ -81,5 +82,6 @@ QDataStream &operator >>(QDataStream &stream, nodeAddresses &myclass)
 {
     stream >> myclass.ipAddress;
     stream >> myclass.port;
+    stream >> myclass.keepAlive;
     return stream;
 }

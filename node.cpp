@@ -1,6 +1,6 @@
 #include "node.h"
 
-node::node(QObject *parent, QString nodePort, nodeAddresses nodeA, bool d ) :  QObject(parent)
+node::node(QObject *parent, QString nodePort, dataStore *ds, nodeAddresses nodeA, bool d ) :  QObject(parent)
 {
     debug = d;
 
@@ -60,21 +60,21 @@ void node::bytesWritten(qint64 bytes) {
 }
 
 // Once a file has been selected for rendering send it to all the people that will render it
-void nodeConnection::sendBlenderFile(QString filename, nodeAddresses node) {
+void node::sendBlenderFile(QString filename, nodeAddresses node) {
     QFile blenderFile (filename);
     if (!blenderFile.open(QIODevice::ReadOnly)) return;
     while (!blenderFile.atEnd()) {
-        write(blenderFile.read(1024));
+        socket->write(blenderFile.read(1024));
     }
     blenderFile.close();
 }
 
 // Once the image has been rendered send it to the owner
-void nodeConnection::sendRenderedImage (QString filename) {
+void node::sendRenderedImage (QString filename) {
     QFile blenderFile (filename);
     if (!blenderFile.open(QIODevice::ReadOnly)) return;
     while (!blenderFile.atEnd()) {
-        write(blenderFile.read(1024));
+        socket->write(blenderFile.read(1024));
     }
     blenderFile.close();
 }

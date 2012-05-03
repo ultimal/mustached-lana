@@ -3,6 +3,7 @@
 
 #include <QTcpServer>
 #include "datastore.h"
+#include "connection.h"
 
 class nodeServer : public QTcpServer
 {

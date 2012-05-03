@@ -10,7 +10,7 @@ class Server : public QTcpServer
 {
     Q_OBJECT
 public:
-    Server(QObject *parent = 0, QString port="666", dataStore *ds=0, int d=false);
+    explicit Server(QObject *parent = 0, QString port="666", dataStore *ds=0, bool d=false);
     void setLocalDS (dataStore *ds);
 
 signals:

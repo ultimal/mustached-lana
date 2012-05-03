@@ -25,6 +25,7 @@ public:
 signals:
 
 public slots:
+
     // Once a file has been selected for rendering send it to all the people that will render it
     void sendBlenderFile(QString filename);
 
@@ -37,8 +38,20 @@ public slots:
     // Process Reads
     void processReadyRead();
 
+    // Get DataStore from Server
+    void getDataStore();
+
+    // Timer: Send Keep Alive to Server
+    void keepAlive();
+
+    // Timer: Send Queue Position to Task
+    void sendQueuePosition();
+
 private:
     bool debug;
+
+    // Timer for the keepAlive / Queue Position updates
+    QTimer timer;
 };
 
 #endif // NODECONNECTION_H
