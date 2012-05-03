@@ -3,10 +3,11 @@
 
 #include <QObject>
 #include <QVector>
+#include <QTime>
 
 struct nodeAddresses {
     QString ipAddress, port;
-    int keepAlive;
+    QTime keepAlive;
 };
 
 struct frameListType {

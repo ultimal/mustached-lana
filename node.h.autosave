@@ -28,6 +28,7 @@ public slots:
     void readyRead();
     void sendBlenderFile(QString filename, nodeAddresses node);
     void sendRenderedImage (QString filename);
+    void sendKeepAlive()
 
 private:
     QTcpSocket *socket;

@@ -9,8 +9,8 @@
 QDataStream &operator <<(QDataStream &stream, const nodeAddresses &myclass);
 QDataStream &operator >>(QDataStream &stream, nodeAddresses &myclass);
 
-class Connection : public QTcpSocket
-{
+class Connection : public QTcpSocket {
+
     Q_OBJECT
 public:
 
@@ -21,14 +21,16 @@ public:
         IMAGE,                                  // Node sending rendered image
         BLENDERFILE,                            // Node sending blender file to be rendered
         QUEUEPOSITION,                          // Job Queue Position
-        NONE                                    // No operation
+        NONE,                                   // No operation
+        KEEPALIVE                               // Keep alive request
     };
 
     explicit Connection(QObject *parent = 0);
     void setLocalDS (dataStore *data) { ds = data; }
 
 signals:
-    
+    void keepAlive(nodeAddresses node);
+
 public slots:
     void processReadyRead();                    // This is where we process the readyRead() signal
     void sendDB();                              // Send the DB of registered nodes out to new node

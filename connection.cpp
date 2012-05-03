@@ -1,12 +1,11 @@
 #include "connection.h"
 
-Connection::Connection(QObject *parent) :
-    QTcpSocket(parent)
-{
+Connection::Connection(QObject *parent) : QTcpSocket(parent) {
     QObject::connect(this,SIGNAL(readyRead()),this,SLOT(processReadyRead()));
 
     // We have the IP Address, we will have to wait for the correct port
     newNode.ipAddress = peerAddress().toString();
+    newNode.keepAlive = QTime::currentTime();
 
     // Starting off currentOperation should set to NONE
     currentOperation = NONE;
@@ -24,6 +23,7 @@ void Connection::processReadyRead() {
         if (msg=="REGISTER") {currentOperation = REGISTER;}
         // Asking server to send a copy of the node DB
         if (msg=="DB") {currentOperation = DB; }
+        if (msg=="KEEPALIVE") {currentOperation = KEEPALIVE;}
     } else {
         // Waiting for port number from the node
         if (currentOperation==REGISTER) {
@@ -32,6 +32,11 @@ void Connection::processReadyRead() {
             currentOperation==NONE;
         }
         if (currentOperation==DB) {sendDB();}
+        if (currentOperation==KEEPALIVE) {
+            newNode.port=readAll();
+            newNode.keepAlive = QTime::currentTime();
+            emit keepAlive(newNode);
+        }
     }
 }
 
@@ -70,16 +75,14 @@ void Connection::sendDB() {
     flush();
 }
 
-QDataStream &operator <<(QDataStream &stream, const nodeAddresses &myclass)
-{
+QDataStream &operator <<(QDataStream &stream, const nodeAddresses &myclass) {
     stream << myclass.ipAddress;
     stream << myclass.port;
     stream << myclass.keepAlive;
     return stream;
 }
 
-QDataStream &operator >>(QDataStream &stream, nodeAddresses &myclass)
-{
+QDataStream &operator >>(QDataStream &stream, nodeAddresses &myclass) {
     stream >> myclass.ipAddress;
     stream >> myclass.port;
     stream >> myclass.keepAlive;
