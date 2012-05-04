@@ -14,15 +14,15 @@ class Connection : public QTcpSocket {
     Q_OBJECT
 public:
 
-    enum dataType {                             // What type of data was sent
-        REGISTER,                               // Register with server
-        PING,                                   // Ping the server
-        DB,                                     // Server is sending the DB
-        IMAGE,                                  // Node sending rendered image
-        BLENDERFILE,                            // Node sending blender file to be rendered
-        QUEUEPOSITION,                          // Job Queue Position
-        NONE,                                   // No operation
-        KEEPALIVE                               // Keep alive request
+    enum dataType {                     // What type of data was sent
+        REGISTER,                       // Register with server
+        PING,                           // Ping the server
+        DB,                             // Server is sending the DB
+        IMAGE,                          // Node sending rendered image
+        BLENDERFILE,                    // Node sending blender file to be rendered
+        QUEUEPOSITION,                  // Job Queue Position
+        NONE,                           // No operation
+        KEEPALIVE                       // Keep alive request
     };
 
     explicit Connection(QObject *parent = 0);
@@ -32,8 +32,8 @@ signals:
     void keepAlive(nodeAddresses node);
 
 public slots:
-    void processReadyRead();                    // This is where we process the readyRead() signal
-    void sendDB();                              // Send the DB of registered nodes out to new node
+    void processReadyRead();            // This is where we process the readyRead() signal
+    void sendDB();                      // Send the DB of registered nodes out to new node
 
 private:
     dataStore *ds;

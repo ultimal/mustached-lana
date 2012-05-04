@@ -9,6 +9,19 @@ void dataStore::nodeAppend(nodeAddresses node) {
     na.append(node);
 }
 
+void dataStore::removeDeadNodes() {
+    // Run through the dataStore looking for node that have not checked in
+    // Within the last 30 minutes
+    for (double i = 0; i<=na.count(); i++) {
+        QTime keepAliveTime = na.at(i).keepAlive;
+        int timeDifference = keepAliveTime.secsTo(QTime::currentTime());
+
+        if (timeDifference > 1800) {
+
+        }
+    }
+}
+
 void dataStore::nodeRemove(nodeAddresses node) {
     int i = 0;
 
@@ -25,41 +38,97 @@ void dataStore::nodeRemove(nodeAddresses node) {
 
 // Update nodes with keep alive data
 void dataStore::nodeUpdate(nodeAddresses node) {
-
+    for (int i=0; i<na.count();i++) {
+        if ((na[i].ipAddress == node.ipAddress) && (na[i].port == node.port)) {
+            // Add keepAlive data to the data Store
+            na[i].keepAlive = QTime::currentTime();
+        }
+    }
 }
 
 // Add Task
-void dataStore::taskAppend() {
-
+void dataStore::taskAppend(taskListType task) {
+    taskList.append(task);
 }
 
 // Remove Task
-void dataStore::taskRemove() {
-
+void dataStore::taskRemove(taskListType task) {
+    for(double i=0; i<=taskList.count(); i++) {
+        if ((taskList.at(i).node.ipAddress == task.node.ipAddress) &&
+            (taskList.at(i).node.port == task.node.port) &&
+            (taskList.at(i).blenderFile == task.blenderFile) &&
+            (taskList.at(i).frameNumber == task.frameNumber)){
+            // If the correct frame is found in the task list
+            taskList.remove(i);
+            return;
+        }
+    }
 }
 
 // Update Task
-void dataStore::taskGetQueuePosition() {
-
+double dataStore::taskGetQueuePosition(taskListType task) {
+    for (double i=0; i<=taskList.count; i++) {
+        if ((taskList.at(i).node.ipAddress == task.node.ipAddress) &&
+            (taskList.at(i).node.port == task.node.port) &&
+            (taskList.at(i).blenderFile == task.blenderFile) &&
+            (taskList.at(i).frameNumber == task.frameNumber)){
+            // If the correct frame is found in the task list
+        return i;
+        }
+    }
 }
 
 // Job: Append
-void dataStore::jobAppend() {
+void dataStore::jobAppend(jobListType job) {
+    jobList.append(job);
+}
 
+void dataStore::jobFrameRemove(frameListType frame) {
+    // Remove job frame from list when rendered image received
+    for (double i=0; i<=jobFrameList.count(); i++) {
+        if ((jobFrameList.at(i).blenderFile == frame.blenderFile) &&
+            (jobFrameList.at(i).frameNumber == frame.frameNumber) &&
+            (jobFrameList.at(i).node.ipAddress == frame.node.ipAddress) &&
+            (jobFrameList.at(i).node.port == frame.node.port)) {
+            jobFrameList.remove(i);
+            return;
+        }
+    }
 }
 
 // Job: Remove
-void dataStore::jobRemove() {
-
+void dataStore::jobRemove(jobListType job) {
+    for (double i=0; i<=jobList.count(); i++) {
+        if ((jobList.at(i).blenderFile == job.blenderFile) &&
+            (jobList.at(i).totalFrames== job.totalFrames) &&
+            (jobList.at(i).node.ipAddress == job.node.ipAddress) &&
+            (jobList.at(i).node.port == job.node.port)) {
+            jobList.remove(i);
+            return;
+        }
+    }
 }
 
 // Job: Update Job List with Queue Position from remote Node
-void dataStore::jobUpdate() {
-
+void dataStore::jobFrameUpdate(frameListType frame) {
+    for (double i=0; i<=jobFrameList.count(); i++) {
+        if ((jobFrameList.at(i).blenderFile == frame.blenderFile) &&
+            (jobFrameList.at(i).frameNumber == frame.frameNumber) &&
+            (jobFrameList.at(i).node.ipAddress == frame.node.ipAddress) &&
+            (jobFrameList.at(i).node.port == frame.node.port)) {
+            jobFrameList.at(i).queuePosition = frame.queuePosition;
+            return;
+        }
+    }
 }
 
 // Job: Next available frame for scheduling
-void dataStore::jobGetNextFrame() {
-
+frameListType dataStore::jobGetNextFrame() {
+    for (double i=0; i<=jobFrameList.count(); i++) {
+        if (jobFrameList.at(i).node.ipAddress == "") {
+            // If there is no node assigned to a frame return that frame
+            frameListType frame = jobFrameList.at(i);
+            return frame;
+        }
+    }
 }
-

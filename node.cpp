@@ -4,6 +4,9 @@ node::node(QObject *parent, QString nodePort, dataStore *ds, nodeAddresses nodeA
 {
     debug = d;
 
+    // Class is being initialized for the first time
+    firstConnection = true;
+
     socket = new QTcpSocket(this);
 
     connect (socket,SIGNAL(connected()),this,SLOT(connected()));
@@ -33,20 +36,28 @@ void node::connected() {
 
     if (debug) { qDebug() << "Connected to server..." << endl; }
 
-    // Once connected send the COMMAND to the server
-    socket->write("REGISTER");
-    socket->flush();
+    // If this is this sockets first Connection to the server
+    if (firstConnection) {
+        // Once connected send the COMMAND to the server
+        socket->write("REGISTER");
+        socket->flush();
 
-    // Now send the node PORT for registration with the server
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out << np;
-    socket->write(block);
-    socket->flush();
+        // Now send the node PORT for registration with the server
+        QByteArray block;
+        QDataStream out(&block, QIODevice::WriteOnly);
+        out << np;
+        socket->write(block);
+        socket->flush();
 
-    // Now request the database
-    socket->write("SENDDB");
-    socket->flush();
+        // Now request the database
+        socket->write("SENDDB");
+        socket->flush();
+
+        firstConnection = false;
+    }
+
+    // Do whatever else for all subsequent connections
+
 }
 
 // Called when disconnected
@@ -80,7 +91,7 @@ void node::sendRenderedImage (QString filename) {
 }
 
 // Called when data available for reading
-void node::readyRead() {
+//void node::readyRead() {
     /*
     qDebug() << "Data received";
 
@@ -95,15 +106,57 @@ void node::readyRead() {
 
     qDebug() << "Writing file out to disk.";
     sample.close(); */
+// }
 
+void node::processReadyRead() {
+    // Get Data Store from server
+    QString tmp = socket->readAll();
     if (currentOperation==NONE) {
-        QString data = socket->readAll();
-        if (data=="SENDDB") { currentOperation==SENDDB; }
-        if (data=="SENDIMAGE") { currentOperation==SENDIMAGE; }
-        if (data=="SENDBLENDERFILE") { currentOperation==SENDBLENDERFILE; }
+        if (tmp=="SENDDB") { currentOperation = SENDDB; }
     } else {
-        if (currentOperation==SENDDB) { currentOperation==NONE; }
-        if (currentOperation==SENDIMAGE) { currentOperation==NONE; }
-        if (currentOperation==SENDBLENDERFILE) { currentOperation==NONE; }
+        if (currentOperation==SENDDB) {
+            // Read the DB
+            QByteArray block;
+            QDataStream out(&block, QIODevice::WriteOnly);
+
+            int i = 0;
+
+            QVector<nodeAddresses> nodeList;
+            nodeAddresses node;
+
+            out << socket->readAll();
+
+            while (!out.atEnd()) {
+                out >> node;
+                ds->nodeAppend(node);
+            }
+
+            currentOperation == NONE;
+        }
     }
+}
+
+void node::sendKeepAlive() {
+
+    socket->write("KEEPALIVE");
+    socket->flush();
+
+    // Send the port number, since that is what differentiates
+    // multiple computers on the same network
+    socket->write(np.toUtf8());
+    socket->flush();
+}
+
+QDataStream &operator <<(QDataStream &stream, const nodeAddresses &myclass) {
+    stream << myclass.ipAddress;
+    stream << myclass.port;
+    stream << myclass.keepAlive;
+    return stream;
+}
+
+QDataStream &operator >>(QDataStream &stream, nodeAddresses &myclass) {
+    stream >> myclass.ipAddress;
+    stream >> myclass.port;
+    stream >> myclass.keepAlive;
+    return stream;
 }

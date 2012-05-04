@@ -42,12 +42,21 @@ public:
     // Recreate the data store from what the server sends
     void restoreDB(QByteArray block);
 
+    // Get Task Queue Position at remote Node
+    double taskGetQueuePosition(taskListType task);
+
+    // Job: Next available frame for scheduling
+    frameListType jobGetNextFrame();
+
 signals:
     
 public slots:
 
     // Used by connection to append a new Node to the data store
     void nodeAppend(nodeAddresses node);
+
+    // Remove dead nodes
+    void removeDeadNodes();
 
     // Used by node manager to remove dead nodes from the data store
     void nodeRemove(nodeAddresses node);
@@ -56,28 +65,28 @@ public slots:
     void nodeUpdate(nodeAddresses node);
 
     // Add Task
-    void taskAppend();
+    void taskAppend(taskListType task);
 
     // Remove Task
-    void taskRemove();
-
-    // Update Task
-    void taskGetQueuePosition();
+    void taskRemove(taskListType task);
 
     // Job: Append
-    void jobAppend();
+    void jobAppend(jobListType job);
+
+    // Remove completed frame from list
+    void jobFrameRemove(frameListType frame);
 
     // Job: Remove
-    void jobRemove();
+    void jobRemove(jobListType job);
 
     // Job: Update Job List with Queue Position from remote Node
-    void jobUpdate();
-
-    // Job: Next available frame for scheduling
-    void jobGetNextFrame();
+    void jobUpdate(frameListType frame);
 
 private:
     QVector<nodeAddresses> na;
+    QVector<taskListType> taskList;
+    QVector<jobListType> jobList;
+    QVector<frameListType> jobFrameList;
 
 };
 
