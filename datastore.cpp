@@ -5,6 +5,18 @@ dataStore::dataStore(QObject *parent) : QObject(parent)
 
 }
 
+nodeAddresses dataStore::nodeGetNext() {
+    nodeAddresses node;
+    node.ipAddress = na[currentNode].ipAddress;
+    node.port = na[currentNode].port;
+    node.keepAlive = na[currentNode].keepAlive;
+
+    // Start from zero again if we reach the end of the list
+    if (na.count() > currentNode) { currentNode++; } else { currentNode = 0; }
+
+    return node;
+}
+
 void dataStore::nodeAppend(nodeAddresses node) {
     na.append(node);
 }

@@ -18,7 +18,6 @@ struct frameListType {
 };
 
 struct jobListType {
-    nodeAddresses node;
     QString blenderFile;
     double totalFrames, completedFrames;
     int percentComplete;
@@ -48,6 +47,9 @@ public:
 
     // Job: Next available frame for scheduling
     frameListType jobGetNextFrame();
+
+    // Node: Get next available node from data store
+    nodeAddresses nodeGetNext();
 
 signals:
     
@@ -89,6 +91,8 @@ private:
     QVector<taskListType> taskList;
     QVector<jobListType> jobList;
     QVector<frameListType> jobFrameList;
+
+    double currentNode;
 };
 
 #endif // DATASTORE_H

@@ -5,7 +5,7 @@
 #include "node.h"
 #include "frmfromtoframe.h"
 #include "datastore.h"
-#include "nodeserver.h"
+#include "node.h"
 
 namespace Ui {
     class frmNode;
@@ -16,8 +16,10 @@ class frmNode : public QWidget
     Q_OBJECT
 
 public:
-    explicit frmNode(QWidget *parent = 0);
+    explicit frmNode(QWidget *parent = 0, QString nodePort="666", dataStore *ds=0, nodeAddresses serverAddress=nodeAddresses(), bool d=false );
     ~frmNode();
+
+    void scheduleJob();
 
 signals:
 
@@ -35,6 +37,7 @@ private:
     double to, from;
     dataStore *ds;
     nodeServer *ns;
+    node *n;
 };
 
 #endif // FRMNODE_H

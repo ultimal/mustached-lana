@@ -11,7 +11,7 @@ class node : public QObject
 {
     Q_OBJECT
 public:
-    explicit node(QObject *parent=0, QString nodePort="666", dataStore *ds=0, nodeAddresses nodeA=nodeAddresses(), bool d=false );
+    explicit node(QObject *parent=0, QString nodePort="666", dataStore *ds=0, nodeAddresses serverAddress=nodeAddresses(), bool d=false );
     
     enum operations {
         NONE,
@@ -43,6 +43,7 @@ private:
     bool debug;
     dataStore *ds;
     bool firstConnection;
+    nodeAddresses serverInfo;
 };
 
 #endif // NODE_H

@@ -1,8 +1,10 @@
 #include "node.h"
 
-node::node(QObject *parent, QString nodePort, dataStore *ds, nodeAddresses nodeA, bool d ) :  QObject(parent)
+node::node(QObject *parent, QString nodePort, dataStore *ds, nodeAddresses serverAddress, bool d ) :  QObject(parent)
 {
     debug = d;
+
+    serverInfo = serverAddress;
 
     // Class is being initialized for the first time
     firstConnection = true;
@@ -14,7 +16,7 @@ node::node(QObject *parent, QString nodePort, dataStore *ds, nodeAddresses nodeA
     connect (socket,SIGNAL(bytesWritten(qint64)),this,SLOT(bytesWritten(qint64)));
     connect (socket,SIGNAL(readyRead()),this,SLOT(readyRead()));
 
-    socket->connectToHost(nodeA.ipAddress, nodeA.port.toInt());
+    socket->connectToHost(serverAddress.ipAddress, serverAddress.port.toInt());
 
     if (!socket->waitForConnected(10000)) {
         if (debug) { qDebug() << "Server not found"; }
@@ -71,12 +73,14 @@ void node::bytesWritten(qint64 bytes) {
 }
 
 // Once a file has been selected for rendering send it to all the people that will render it
-void node::sendBlenderFile(QString filename, nodeAddresses node) {
+bool node::sendBlenderFile(QString filename, nodeAddresses node) {
     QFile blenderFile (filename);
-    if (!blenderFile.open(QIODevice::ReadOnly)) return;
+    if (!blenderFile.open(QIODevice::ReadOnly)) return false;
+
     while (!blenderFile.atEnd()) {
-        socket->write(blenderFile.read(1024));
+        if (!socket->write(blenderFile.read(1024))) { return false; }
     }
+
     blenderFile.close();
 }
 
