@@ -1,16 +1,12 @@
-#include <QtCore/QCoreApplication>
-#include "server.h"
+#include <QtGui/QApplication>
+
 #include "getopt.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-// Node code
-#include "node.h"
-
-// Server code
-#include "nodemanager.h"
-
 #include <QDebug>
+
+#include "frmnode.h"
+#include "frmserver.h"
 
 const char* program_name;
 
@@ -24,6 +20,7 @@ void print_usage (FILE* stream, int exit_code)
              "   -p   --port [number]          Used by both --node and --server options. Is a value between 0 and 65536.\n"
              "   -h   --host [ip_address]      Host is the server's IP address.\n\n"
              "   -c   --code                   Writes the source code to disk.\n"
+             "   -d   --debug                  Run in debug mode. Only available in DEV version.\n"
              "    ?   --help                   Prints this information.\n\n");
 
     exit (exit_code);
@@ -31,10 +28,16 @@ void print_usage (FILE* stream, int exit_code)
 
 int main(int argc, char *argv[])
 {
+
+    bool debug = false;
+
     // Grab the program name from the command line
     program_name = argv[0];
 
-    QCoreApplication a(argc, argv);
+    QApplication a(argc, argv);
+
+    frmNode node;
+    frmServer server;
 
     /*
     QFile in("file.png");
@@ -60,16 +63,17 @@ int main(int argc, char *argv[])
     int next_option;
 
     // Short options
-    const char* const short_options = "ch:np:s";
+    const char* const short_options = "cdh:np:s";
 
     // Long options
     const struct option long_options[] = {
-        { "code",   no_argument,        NULL,           'c' },
-        { "help",   no_argument,        NULL,           '?' },
-        { "host",   required_argument,  NULL,           'h' },
-        { "node",   no_argument,        NULL,           'n' },
-        { "port",   required_argument,  NULL,           'p' },
-        { "server", no_argument,        NULL,           's' }
+        { "code",   no_argument,        NULL,   'c' },
+        { "debug",  no_argument,        NULL,   'd' },
+        { "help",   no_argument,        NULL,   '?' },
+        { "host",   required_argument,  NULL,   'h' },
+        { "node",   no_argument,        NULL,   'n' },
+        { "port",   required_argument,  NULL,   'p' },
+        { "server", no_argument,        NULL,   's' }
 
     };
 
@@ -80,7 +84,11 @@ int main(int argc, char *argv[])
         {
         case 'c':
             // Extract code from end of executable or download it from the internet
-            printf ("Not implemented");
+            break;
+        case 'd':
+            // Debug mode on
+            debug=true;
+            qDebug() << "Debug mode: ON";
             break;
         case 'h':
             // Get the host ip address. This is the ip the node connects to.
@@ -116,29 +124,36 @@ int main(int argc, char *argv[])
         }
 
         // Launch in Node mode
-        qDebug() << "Launching in NODE mode with DEFAULT port";
+        if (debug) { qDebug() << "Launching in NODE mode with DEFAULT port"; }
+
+        // launchNodeDialog();
+        node.show();
     }
 
     // If launched as server
     if (isServer) {
+
         // If the port was not specified use standard port
         if (port=="0") {
             port = "666";
-            qDebug() << "Launching in SERVER mode with DEFAULT port.";
+            if (debug) { qDebug() << "Launching in SERVER mode with DEFAULT port."; }
         }
-        qDebug() << "Launching in SERVER mode";
-        // Launch in server mode
-        nodeManager *mgr = new nodeManager(0, port);
+
+        if (debug) { qDebug() << "Launching in SERVER mode"; }
+
+        server.show();
+
     }
 
     // If simply launched without any arguments, run in node mode for internet server
     if ((!isNode) && (!isServer)) {
         port = "666";       // TODO: Get this value from what the user previously set it to using QSettings
-        qDebug() << "Launching in INTERNET NODE mode using DEFAULT PORT and DEFAULT HOST ADDRESS";
+        if (debug) { qDebug() << "Launching in INTERNET NODE mode using DEFAULT PORT and DEFAULT HOST ADDRESS";}
+        node.show();
     }
 
-    qDebug() << "isNode: " << isNode << " | host_address: " << hostAddress << " | port: " << port;
-    qDebug() << "isServer: " << isServer;
+    if (debug) { qDebug() << "isNode: " << isNode << " | host_address: " << hostAddress << " | port: " << port; }
+    if (debug) { qDebug() << "isServer: " << isServer; }
 
     return a.exec();
 }

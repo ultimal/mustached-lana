@@ -147,16 +147,6 @@ void node::sendKeepAlive() {
     socket->flush();
 }
 
-QDataStream &operator <<(QDataStream &stream, const nodeAddresses &myclass) {
-    stream << myclass.ipAddress;
-    stream << myclass.port;
-    stream << myclass.keepAlive;
-    return stream;
-}
+void node::scheduleBlenderFile(QString filename) {
 
-QDataStream &operator >>(QDataStream &stream, nodeAddresses &myclass) {
-    stream >> myclass.ipAddress;
-    stream >> myclass.port;
-    stream >> myclass.keepAlive;
-    return stream;
 }

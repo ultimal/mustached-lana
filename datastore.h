@@ -14,6 +14,7 @@ struct frameListType {
     nodeAddresses node;
     QString blenderFile;
     double queuePosition, frameNumber;
+    QTime keepAlive;
 };
 
 struct jobListType {
@@ -80,14 +81,14 @@ public slots:
     void jobRemove(jobListType job);
 
     // Job: Update Job List with Queue Position from remote Node
-    void jobUpdate(frameListType frame);
+    void jobFrameUpdate(frameListType frame);
+
 
 private:
     QVector<nodeAddresses> na;
     QVector<taskListType> taskList;
     QVector<jobListType> jobList;
     QVector<frameListType> jobFrameList;
-
 };
 
 #endif // DATASTORE_H

@@ -4,16 +4,10 @@
 #
 #-------------------------------------------------
 
-QT       += core network
-
-QT       -= gui
+QT       += core gui network
 
 TARGET = mustached-lana
-CONFIG   += console
-CONFIG   -= app_bundle
-
 TEMPLATE = app
-
 
 SOURCES += main.cpp \
     server.cpp \
@@ -22,7 +16,10 @@ SOURCES += main.cpp \
     nodemanager.cpp \
     node.cpp \
     nodeserver.cpp \
-    nodeconnection.cpp
+    nodeconnection.cpp \
+    frmnode.cpp \
+    frmserver.cpp \
+    frmfromtoframe.cpp
 
 HEADERS += \
     server.h \
@@ -31,4 +28,25 @@ HEADERS += \
     nodemanager.h \
     node.h \
     nodeserver.h \
-    nodeconnection.h
+    nodeconnection.h \
+    frmnode.h \
+    frmserver.h \
+    frmfromtoframe.h
+
+FORMS += \
+    frmnode.ui \
+    frmserver.ui \
+    frmfromtoframe.ui
+
+
+
+
+
+
+
+
+
+
+
+
+

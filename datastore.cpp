@@ -67,7 +67,7 @@ void dataStore::taskRemove(taskListType task) {
 
 // Update Task
 double dataStore::taskGetQueuePosition(taskListType task) {
-    for (double i=0; i<=taskList.count; i++) {
+    for (double i=0; i<=taskList.count(); i++) {
         if ((taskList.at(i).node.ipAddress == task.node.ipAddress) &&
             (taskList.at(i).node.port == task.node.port) &&
             (taskList.at(i).blenderFile == task.blenderFile) &&
@@ -83,6 +83,7 @@ void dataStore::jobAppend(jobListType job) {
     jobList.append(job);
 }
 
+// Job: Frame Remove
 void dataStore::jobFrameRemove(frameListType frame) {
     // Remove job frame from list when rendered image received
     for (double i=0; i<=jobFrameList.count(); i++) {
@@ -116,7 +117,8 @@ void dataStore::jobFrameUpdate(frameListType frame) {
             (jobFrameList.at(i).frameNumber == frame.frameNumber) &&
             (jobFrameList.at(i).node.ipAddress == frame.node.ipAddress) &&
             (jobFrameList.at(i).node.port == frame.node.port)) {
-            jobFrameList.at(i).queuePosition = frame.queuePosition;
+            jobFrameList[i].queuePosition = frame.queuePosition;
+            jobFrameList[i].keepAlive = QTime::currentTime();
             return;
         }
     }

@@ -27,23 +27,28 @@ signals:
 
 public slots:
 
-    // Once a file has been selected for rendering send it to all the people that will render it
-    void getBlenderFile(QString filename);
-
-    // Once the image has been rendered send it to the owner
-    void getRenderedImage (QString filename);
-
     // Find the position in the queue for specified na and send it to them
     void getQueuePosition (nodeAddresses na);
 
     // Process Reads
     void processReadyRead();
 
+    // Get BlenderFile / Read the "block" and stream it to the file
+    void getBlenderFile();
+
+    // Get ImageFile / Read the "block" and stream it to the file
+    void getImageFile();
+
 private:
     bool debug;
 
     // Timer for the keepAlive / Queue Position updates
     QTimer timer;
+
+    int currentOperation;
+
+    QByteArray block;
+
 };
 
 #endif // NODECONNECTION_H
