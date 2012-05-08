@@ -1,6 +1,6 @@
 #include "nodeconnection.h"
 
-nodeConnection::nodeConnection(QObject *parent, bool debug) : QTcpSocket(parent)
+nodeConnection::nodeConnection(QObject *parent, dataStore *ds,  bool debug) : QTcpSocket(parent)
 {
 
 }
@@ -19,7 +19,18 @@ void nodeConnection::processReadyRead() {
         if (data=="GETQUEUEPOSITION") { currentOperation==GETQUEUEPOSITION; }
     } else {
         if (currentOperation==GETIMAGE) { getImageFile();currentOperation==NONE; }
-        if (currentOperation==GETBLENDERFILE) { getBlenderFile();currentOperation==NONE; }
+        if (currentOperation==GETBLENDERFILE) {
+            if (getBlenderFileOperation==SOURCEIP)      {task.node.ipAddress = this->readAll();getBlenderFileOperation==SOURCEPORT;}
+            if (getBlenderFileOperation==SOURCEPORT)    {task.node.port = this->readAll();getBlenderFileOperation==BLENDERFILENAME;}
+            if (getBlenderFileOperation==BLENDERFILENAME) {task.blenderFile = this->readAll();getBlenderFileOperation==FRAMENUMBER;}
+            if (getBlenderFileOperation==FRAMENUMBER)   {task.frameNumber = this->readAll();getBlenderFileOperation==BLENDERFILE;}
+            if (getBlenderFileOperation==BLENDERFILE)   {
+                // Download and save the file
+                // ...
+                getBlenderFileProgress=NONE;
+                currentOperation=NONE;
+            }
+        }
     }
 }
 

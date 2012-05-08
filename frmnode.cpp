@@ -10,7 +10,7 @@ frmNode::frmNode(QWidget *parent, QString nodePort="666", dataStore *ds=0, nodeA
     toFrom = new frmFromToFrame(this);
     ds = new dataStore(this);
 
-    n = new node(this, "666", ds, serverAddress , true)
+    n = new node(this, "666", ds, serverAddress , true);
 
     // Setup all connections required to send and receive information
     connect (ui->btnScheduledJobs,SIGNAL(clicked()),this,SLOT(openFile()));
@@ -42,7 +42,7 @@ void frmNode::scheduleJob() {
         frame.queuePosition = 0;
 
         // Tell the node socket to connect to the node and send the blenderfile
-        while (!n->sendBlenderFile(frame.blenderFile,frame.node)) {
+        while (!n->sendBlenderFile(frame)) {
             // If unsuccessfull reschedule the frame to a different node
             frame.node = ds->nodeGetNext();
         }
@@ -60,9 +60,9 @@ void frmNode::openFile() {
                 tr("Blender Files (*.blend)"));
 
     // Get Frame count
-    toFrom->show();
+    toFrom->exec();
 
     // Schedule frames using Data Store
-
+    scheduleJob();
 
 }

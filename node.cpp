@@ -73,15 +73,56 @@ void node::bytesWritten(qint64 bytes) {
 }
 
 // Once a file has been selected for rendering send it to all the people that will render it
-bool node::sendBlenderFile(QString filename, nodeAddresses node) {
-    QFile blenderFile (filename);
+bool node::sendBlenderFile (frameListType f) {
+    QFile blenderFile (f.blenderFile);
     if (!blenderFile.open(QIODevice::ReadOnly)) return false;
 
-    while (!blenderFile.atEnd()) {
-        if (!socket->write(blenderFile.read(1024))) { return false; }
-    }
+    // Connect to node and send file
+    QTcpSocket *tmpSocket = new QTcpSocket(this);
+    if (tmpSocket->connectToHost(f.node.ipAddress, f.node.port)) {
+        // Wait for 10 seconds to connect then timeout and return false
+        if (!socket->waitForConnected(10000)) {
+            // If connect failed
+            if (debug) { qDebug() << "  Node: " << f.node.ipAddress << ":" << f.node.port << " not found"; }
+            return false;
+        } else {
+            // If connected
+            if (debug) { qDebug() << "* Node: " << f.node.ipAddress << ":" << f.node.port << " connected"; }
 
-    blenderFile.close();
+            // Send file
+            tmpSocket->write("GETBLENDERFILE");
+            tmpSocket->flush();
+
+            // Send Local IP Address
+            tmpSocket->write(ds->getMyIP());
+            tmpSocket->flush();
+
+            // Send Local Port
+            tmpSocket->write(ds->getMyPort());
+            tmpSocket->flush();
+
+            // Send File Name
+            tmpSocket->write(f.blenderFile);
+            tmpSocket->flush();
+
+            // Send Frame Number
+            tmpSocket->write(f.frameNumber);
+            tmpSocket->flush();
+
+            while (!blenderFile.atEnd()) {
+                if (!tmpSocket->write(blenderFile.read(1024))) { return false; }
+            }
+        }
+
+        if (debug) { qDebug() << "* Node: " << f.node.ipAddress << ":" << f.node.port << " file sent"; }
+
+        blenderFile.close();
+        tmpSocket->close();
+
+        return true;
+    } else {
+        return false;
+    }
 }
 
 // Once the image has been rendered send it to the owner

@@ -14,13 +14,22 @@ class nodeConnection : public QTcpSocket
     Q_OBJECT
 
 public:
-    explicit nodeConnection(QObject *parent = 0, bool debug=false);
+    explicit nodeConnection(QObject *parent = 0, dataStore *ds, bool debug=false);
 
     enum getOperations {
         NONE,
         GETIMAGE,
         GETBLENDERFILE,
         GETQUEUEPOSITION
+    };
+
+    enum getBlenderFileProgress {
+        NONE,
+        SOURCEIP,
+        SOURCEPORT,
+        BLENDERFILENAME,
+        FRAMENUMBER,
+        BLENDERFILE
     };
 
 signals:
@@ -46,8 +55,12 @@ private:
     QTimer timer;
 
     int currentOperation;
+    int getBlenderFileOperation;
 
     QByteArray block;
+
+    dataStore *d;
+    taskListType task;
 
 };
 
