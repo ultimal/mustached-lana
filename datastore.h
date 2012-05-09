@@ -11,22 +11,24 @@ struct nodeAddresses {
 };
 
 struct frameListType {
-    nodeAddresses node;
-    QString blenderFile;
-    double queuePosition, frameNumber;
-    QTime keepAlive;
+    nodeAddresses   node;
+    QString         blenderFile;
+    QString         imageFile;
+    double          queuePosition, frameNumber;
+    QTime           keepAlive;
+    bool            complete;
 };
 
 struct jobListType {
-    QString blenderFile;
-    double totalFrames, completedFrames;
-    int percentComplete;
+    QString         blenderFile;
+    double          totalFrames, completedFrames;
+    int             percentComplete;
 };
 
 struct taskListType {
-    nodeAddresses node;
-    QString blenderFile;
-    double frameNumber;
+    nodeAddresses   node;
+    QString         blenderFile;
+    double          frameNumber;
 };
 
 class dataStore : public QObject
@@ -50,6 +52,10 @@ public:
 
     // Node: Get next available node from data store
     nodeAddresses nodeGetNext();
+
+    QVector<taskListType> getTaskList()      { return taskList; }
+    QVector<jobListType> getJobList()        { return jobList; }
+    QVector<frameListType> getJobFrameList() { return jobFrameList; }
 
 signals:
     

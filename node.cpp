@@ -110,7 +110,7 @@ bool node::sendBlenderFile (frameListType f) {
             tmpSocket->flush();
 
             while (!blenderFile.atEnd()) {
-                if (!tmpSocket->write(blenderFile.read(1024))) { return false; }
+                if (!tmpSocket->write(blenderFile.read(4096))) { return false; }
             }
         }
 

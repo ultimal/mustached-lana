@@ -36,6 +36,11 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
+    // Configure Settings Object
+    QCoreApplication::setOrganizationName("Haider Raza");
+    QCoreApplication::setOrganizationDomain("haiderraza.com");
+    QCoreApplication::setApplicationName("Mustached-Lana");
+
     frmNode node;
     frmServer server;
 
@@ -142,7 +147,6 @@ int main(int argc, char *argv[])
         if (debug) { qDebug() << "Launching in SERVER mode"; }
 
         server.show();
-
     }
 
     // If simply launched without any arguments, run in node mode for internet server

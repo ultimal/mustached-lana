@@ -5,6 +5,8 @@
 #include <QtNetwork>
 #include <QDebug>
 #include "datastore.h"
+#include <QFile>
+#include <QDir>
 
 QDataStream &operator <<(QDataStream &stream, const nodeAddresses &myclass);
 QDataStream &operator >>(QDataStream &stream, nodeAddresses &myclass);
@@ -17,19 +19,29 @@ public:
     explicit nodeConnection(QObject *parent = 0, dataStore *ds, bool debug=false);
 
     enum getOperations {
-        NONE,
-        GETIMAGE,
-        GETBLENDERFILE,
-        GETQUEUEPOSITION
+        OP_NONE,
+        OP_GETIMAGE,
+        OP_GETBLENDERFILE,
+        OP_GETQUEUEPOSITION
     };
 
     enum getBlenderFileProgress {
-        NONE,
-        SOURCEIP,
-        SOURCEPORT,
-        BLENDERFILENAME,
-        FRAMENUMBER,
-        BLENDERFILE
+        BF_NONE,
+        BF_SOURCEIP,
+        BF_SOURCEPORT,
+        BF_BLENDERFILENAME,
+        BF_FRAMENUMBER,
+        BF_BLENDERFILE
+    };
+
+    enum getImageFileOperationProgress {
+        IMG_NONE,
+        IMG_SOURCEIP,
+        IMG_SOURCEPORT,
+        IMG_IMAGEFILENAME,
+        IMG_FRAMENUMBER,
+        IMG_BLENDERFILENAME,
+        IMG_IMAGEFILE
     };
 
 signals:
@@ -42,12 +54,6 @@ public slots:
     // Process Reads
     void processReadyRead();
 
-    // Get BlenderFile / Read the "block" and stream it to the file
-    void getBlenderFile();
-
-    // Get ImageFile / Read the "block" and stream it to the file
-    void getImageFile();
-
 private:
     bool debug;
 
@@ -56,12 +62,13 @@ private:
 
     int currentOperation;
     int getBlenderFileOperation;
+    int getImageFileOperation;
 
     QByteArray block;
 
     dataStore *d;
     taskListType task;
-
+    frameListType img;
 };
 
 #endif // NODECONNECTION_H
