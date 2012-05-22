@@ -16,7 +16,10 @@ class frmNode : public QWidget
     Q_OBJECT
 
 public:
-    explicit frmNode(QWidget *parent = 0, QString nodePort="666", dataStore *ds=0, nodeAddresses serverAddress=nodeAddresses(), bool d=false );
+    explicit frmNode(QWidget *parent = 0,
+                     QString nodePort="666",
+                     nodeAddresses serverAddress=nodeAddresses(),
+                     bool d=false );
     ~frmNode();
 
     void scheduleJob();
@@ -37,7 +40,6 @@ private:
     double to, from;
     dataStore *ds;
     nodeServer *ns;
-    node *n;
 };
 
 #endif // FRMNODE_H

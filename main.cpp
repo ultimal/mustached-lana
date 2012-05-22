@@ -41,8 +41,15 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("haiderraza.com");
     QCoreApplication::setApplicationName("Mustached-Lana");
 
-    frmNode node;
-    frmServer server;
+    frmNode *node;
+    frmServer *server;
+
+    QSettings settings;
+
+    QString serverIp = settings.value("Server/IP",ui->txtServerPublicIP);
+    QString serverPort = settings.value("Server/Port",ui->txtServerPort);
+    QString tempFolder = settings.value("Node/TempFolder",ui->txtTempFolder);
+    QString port = settings.value("Node/Port", ui->txtNodePort);
 
     /*
     QFile in("file.png");
@@ -56,10 +63,10 @@ int main(int argc, char *argv[])
     out.close(); */
 
     // Arguments from command-line parameters
-    QString port = "0";
+    QString port = settings.value("nodePort");
 
     // Connect to this server if launched without arguments
-    QString hostAddress="127.0.0.1";
+    QString hostAddress= settings.value("serverIP");
 
     // Command line options and flags
     static int isNode, isServer;
@@ -79,7 +86,6 @@ int main(int argc, char *argv[])
         { "node",   no_argument,        NULL,   'n' },
         { "port",   required_argument,  NULL,   'p' },
         { "server", no_argument,        NULL,   's' }
-
     };
 
     do {
@@ -132,7 +138,8 @@ int main(int argc, char *argv[])
         if (debug) { qDebug() << "Launching in NODE mode with DEFAULT port"; }
 
         // launchNodeDialog();
-        node.show();
+        node = new frmNode(0,);
+        node->show();
     }
 
     // If launched as server
@@ -141,18 +148,24 @@ int main(int argc, char *argv[])
         // If the port was not specified use standard port
         if (port=="0") {
             port = "666";
+
             if (debug) { qDebug() << "Launching in SERVER mode with DEFAULT port."; }
         }
 
         if (debug) { qDebug() << "Launching in SERVER mode"; }
 
-        server.show();
+        server = new frmServer(0,port,debug);
+        server->show();
     }
 
     // If simply launched without any arguments, run in node mode for internet server
     if ((!isNode) && (!isServer)) {
-        port = "666";       // TODO: Get this value from what the user previously set it to using QSettings
+        nodeAddresses n;
+        n.ipAddress = "127.0.0.1";
+        n.port = "666";
+
         if (debug) { qDebug() << "Launching in INTERNET NODE mode using DEFAULT PORT and DEFAULT HOST ADDRESS";}
+        node = new frmNode (0,NULL,n,debug);
         node.show();
     }
 

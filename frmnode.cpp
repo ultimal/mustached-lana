@@ -2,15 +2,21 @@
 #include "ui_frmnode.h"
 #include <QFileDialog>
 
-frmNode::frmNode(QWidget *parent, QString nodePort="666", dataStore *ds=0, nodeAddresses serverAddress=nodeAddresses(), bool d=false ) :  QWidget(parent),  ui(new Ui::frmNode)
+frmNode::frmNode(QWidget *parent,
+                 QString nodePort,
+                 nodeAddresses serverAddress,
+                 bool d) :  QWidget(parent),  ui(new Ui::frmNode)
 {
-    // Setup all objects required for this app run
+    // Setup all objects required for this app to run
     ui->setupUi(this);
-    n = new node(this);
+
     toFrom = new frmFromToFrame(this);
+
     ds = new dataStore(this);
 
-    n = new node(this, "666", ds, serverAddress , true);
+    n = new node(this, nodePort, ds, serverAddress , true);
+
+    ds->setMyPort(nodePort);
 
     // Setup all connections required to send and receive information
     connect (ui->btnScheduledJobs,SIGNAL(clicked()),this,SLOT(openFile()));
@@ -60,7 +66,7 @@ void frmNode::openFile() {
                 tr("Blender Files (*.blend)"));
 
     // Get Frame count
-    toFrom->exec();
+    toFrom->show();
 
     // Schedule frames using Data Store
     scheduleJob();

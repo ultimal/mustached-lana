@@ -19,7 +19,8 @@ SOURCES += main.cpp \
     nodeconnection.cpp \
     frmnode.cpp \
     frmserver.cpp \
-    frmfromtoframe.cpp
+    frmfromtoframe.cpp \
+    frmsettings.cpp
 
 HEADERS += \
     server.h \
@@ -31,12 +32,14 @@ HEADERS += \
     nodeconnection.h \
     frmnode.h \
     frmserver.h \
-    frmfromtoframe.h
+    frmfromtoframe.h \
+    frmsettings.h
 
 FORMS += \
     frmnode.ui \
     frmserver.ui \
-    frmfromtoframe.ui
+    frmfromtoframe.ui \
+    frmsettings.ui
 
 
 

@@ -16,7 +16,7 @@ class nodeConnection : public QTcpSocket
     Q_OBJECT
 
 public:
-    explicit nodeConnection(QObject *parent = 0, dataStore *ds, bool debug=false);
+    explicit nodeConnection(QObject *parent = 0, dataStore *ds=0, bool debug=false);
 
     enum getOperations {
         OP_NONE,
@@ -69,6 +69,8 @@ private:
     dataStore *d;
     taskListType task;
     frameListType img;
+
+    QSettings settings;
 };
 
 #endif // NODECONNECTION_H

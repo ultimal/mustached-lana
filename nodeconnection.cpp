@@ -12,20 +12,20 @@ void nodeConnection::getQueuePosition (nodeAddresses na) {
 
 // Process Reads
 void nodeConnection::processReadyRead() {
-    if (currentOperation==NONE) {
+    if (currentOperation==OP_NONE) {
         QString data = readAll();
         if (data=="GETIMAGE") { currentOperation==OP_GETIMAGE; }
         if (data=="GETBLENDERFILE") { currentOperation==OP_GETBLENDERFILE; }
         if (data=="GETQUEUEPOSITION") { currentOperation==OP_GETQUEUEPOSITION; }
     } else {
-        if (currentOperation==GETIMAGE) {
-            if (getImageFileOperation==IMG_SOURCEIP)        { img.node.ipAddress = this->readAll(); getImageFileOperationProgress=IMG_SOURCEPORT; }
-            if (getImageFileOperation==IMG_SOURCEPORT)      { img.node.port = this->readAll(); getImageFileOperationProgress=IMG_IMAGEFILENAME; }
-            if (getImageFileOperation==IMG_IMAGEFILENAME)   { img.imageFile = this->readAll(); getImageFileOperationProgress=IMG_FRAMENUMBER; }
-            if (getImageFileOperation==IMG_FRAMENUMBER)     { img.frameNumber = this->readAll(); getImageFileOperationProgress=IMG_BLENDERFILENAME; }
-            if (getImageFileOperation==IMG_BLENDERFILENAME) { img.lenderFile = this->readAll(); getImageFileOperationProgress=IMG_IMAGEFILE; }
+        if (currentOperation==OP_GETIMAGE) {
+            if (getImageFileOperation==IMG_SOURCEIP)        { img.node.ipAddress = this->readAll(); getImageFileOperation=IMG_SOURCEPORT; }
+            if (getImageFileOperation==IMG_SOURCEPORT)      { img.node.port = this->readAll(); getImageFileOperation=IMG_IMAGEFILENAME; }
+            if (getImageFileOperation==IMG_IMAGEFILENAME)   { img.imageFile = this->readAll(); getImageFileOperation=IMG_FRAMENUMBER; }
+            if (getImageFileOperation==IMG_FRAMENUMBER)     { img.frameNumber = this->readAll().toDouble(); getImageFileOperation=IMG_BLENDERFILENAME; }
+            if (getImageFileOperation==IMG_BLENDERFILENAME) { img.imageFile = this->readAll(); getImageFileOperation=IMG_IMAGEFILE; }
             if (getImageFileOperation==IMG_IMAGEFILE)       {
-                QFile imageFile(QSettings::value("ProjectPath").toString() + img.blenderFile + "/" + img.imageFile);
+                QFile imageFile(settings.value("ProjectPath").toString() + img.blenderFile + "/" + img.imageFile);
                 imageFile.open(QFile::WriteOnly);
 
                 if (debug) { qDebug() << "Receiving Rendered Image: " << img.imageFile << " from project: " + img.blenderFile; }
@@ -56,12 +56,13 @@ void nodeConnection::processReadyRead() {
                     i++;
                 }
             }
+        }
 
-        if (currentOperation==GETBLENDERFILE) {
+        if (currentOperation==OP_GETBLENDERFILE) {
             if (getBlenderFileOperation==BF_SOURCEIP)      {task.node.ipAddress = this->readAll();getBlenderFileOperation=BF_SOURCEPORT;}
             if (getBlenderFileOperation==BF_SOURCEPORT)    {task.node.port = this->readAll();getBlenderFileOperation=BF_BLENDERFILENAME;}
             if (getBlenderFileOperation==BF_BLENDERFILENAME) {task.blenderFile = this->readAll();getBlenderFileOperation=BF_FRAMENUMBER;}
-            if (getBlenderFileOperation==BF_FRAMENUMBER)   {task.frameNumber = this->readAll();getBlenderFileOperation=BF_BLENDERFILE;}
+            if (getBlenderFileOperation==BF_FRAMENUMBER)   {task.frameNumber = this->readAll().toDouble();getBlenderFileOperation=BF_BLENDERFILE;}
             if (getBlenderFileOperation==BF_BLENDERFILE)   {
                 // Download and save the file
                 // Saving a file
@@ -79,7 +80,7 @@ void nodeConnection::processReadyRead() {
 
                 qDebug() << "Writing file out to disk.";
                 sample.close(); */
-                QFile blenderFile(QSettings::value("TemporaryPath").toString() + task.blenderFile);
+                QFile blenderFile(settings.value("TemporaryPath").toString() + task.blenderFile);
                 blenderFile.open(QFile::WriteOnly);
 
                 if (debug) { qDebug() << "Receiving file: " << task.blenderFile << " from " << task.node.ipAddress << ":" << task.node.port; }
@@ -93,7 +94,7 @@ void nodeConnection::processReadyRead() {
 
                 // Post the task to data store
                 d->taskAppend(task);
-                getBlenderFileProgress=BF_NONE;
+                getBlenderFileOperation=BF_NONE;
                 currentOperation=OP_NONE;
             }
         }

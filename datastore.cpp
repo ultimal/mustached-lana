@@ -113,11 +113,9 @@ void dataStore::jobFrameRemove(frameListType frame) {
 void dataStore::jobRemove(jobListType job) {
     for (double i=0; i<=jobList.count(); i++) {
         if ((jobList.at(i).blenderFile == job.blenderFile) &&
-            (jobList.at(i).totalFrames== job.totalFrames) &&
-            (jobList.at(i).node.ipAddress == job.node.ipAddress) &&
-            (jobList.at(i).node.port == job.node.port)) {
-            jobList.remove(i);
-            return;
+            (jobList.at(i).totalFrames== job.totalFrames)) {
+                jobList.remove(i);
+                return;
         }
     }
 }

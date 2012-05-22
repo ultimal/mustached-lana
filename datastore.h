@@ -57,6 +57,10 @@ public:
     QVector<jobListType> getJobList()        { return jobList; }
     QVector<frameListType> getJobFrameList() { return jobFrameList; }
 
+    void setMyPort (QString port) { myPort = port; }
+
+    QString getMyPort() { return myPort; }
+
 signals:
     
 public slots:
@@ -91,13 +95,13 @@ public slots:
     // Job: Update Job List with Queue Position from remote Node
     void jobFrameUpdate(frameListType frame);
 
-
 private:
     QVector<nodeAddresses> na;
     QVector<taskListType> taskList;
     QVector<jobListType> jobList;
     QVector<frameListType> jobFrameList;
 
+    QString myPort;
     double currentNode;
 };
 

@@ -7,6 +7,8 @@ frmFromToFrame::frmFromToFrame(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    QWidget::setWindowFlags(Qt::Popup);
+
     connect (ui->txtFrom, SIGNAL(textChanged(QString)),this,SLOT(setFrom(QString)));
     connect (ui->txtTo, SIGNAL(textChanged(QString)),this,SLOT(setTo(QString)));
     connect (ui->btnOk,SIGNAL(clicked()),this,SLOT(okClicked()));

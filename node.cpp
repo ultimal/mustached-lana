@@ -18,6 +18,7 @@ node::node(QObject *parent, QString nodePort, dataStore *ds, nodeAddresses serve
 
     socket->connectToHost(serverAddress.ipAddress, serverAddress.port.toInt());
 
+    // TODO: Server connect timeout needs to be a user set thing
     if (!socket->waitForConnected(10000)) {
         if (debug) { qDebug() << "Server not found"; }
     } else {
@@ -79,10 +80,14 @@ bool node::sendBlenderFile (frameListType f) {
 
     // Connect to node and send file
     QTcpSocket *tmpSocket = new QTcpSocket(this);
-    if (tmpSocket->connectToHost(f.node.ipAddress, f.node.port)) {
-        // Wait for 10 seconds to connect then timeout and return false
-        if (!socket->waitForConnected(10000)) {
-            // If connect failed
+
+    QString ip = f.node.ipAddress;
+    quint16 port = f.node.port.toInt();
+
+    tmpSocket->connectToHost(ip,port);
+
+    // TODO: Connection timeout should be a user setting
+    if (!tmpSocket->waitForConnected(10000)) {
             if (debug) { qDebug() << "  Node: " << f.node.ipAddress << ":" << f.node.port << " not found"; }
             return false;
         } else {
@@ -94,35 +99,32 @@ bool node::sendBlenderFile (frameListType f) {
             tmpSocket->flush();
 
             // Send Local IP Address
-            tmpSocket->write(ds->getMyIP());
+            tmpSocket->write(ds->getMyIP().toUtf8());
             tmpSocket->flush();
 
             // Send Local Port
-            tmpSocket->write(ds->getMyPort());
+            tmpSocket->write(ds->getMyPort().toUtf8());
             tmpSocket->flush();
 
             // Send File Name
-            tmpSocket->write(f.blenderFile);
+            tmpSocket->write(f.blenderFile.toUtf8());
             tmpSocket->flush();
 
             // Send Frame Number
-            tmpSocket->write(f.frameNumber);
+            tmpSocket->write(QString::number(f.frameNumber).toUtf8());
             tmpSocket->flush();
 
             while (!blenderFile.atEnd()) {
                 if (!tmpSocket->write(blenderFile.read(4096))) { return false; }
             }
+
+            if (debug) { qDebug() << "* Node: " << f.node.ipAddress << ":" << f.node.port << " file sent"; }
+
+            blenderFile.close();
+            tmpSocket->close();
+
+            return true;
         }
-
-        if (debug) { qDebug() << "* Node: " << f.node.ipAddress << ":" << f.node.port << " file sent"; }
-
-        blenderFile.close();
-        tmpSocket->close();
-
-        return true;
-    } else {
-        return false;
-    }
 }
 
 // Once the image has been rendered send it to the owner
@@ -190,8 +192,4 @@ void node::sendKeepAlive() {
     // multiple computers on the same network
     socket->write(np.toUtf8());
     socket->flush();
-}
-
-void node::scheduleBlenderFile(QString filename) {
-
 }

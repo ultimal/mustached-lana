@@ -23,8 +23,8 @@ signals:
     void sendToFrame(double toFrame);
 
 public slots:
-    void setFrom(QString fromFrame) { from = fromFrame; }
-    void setTo(QString toFrame) { to = toFrame; }
+    void setFrom(QString fromFrame) { from = fromFrame.toDouble(); }
+    void setTo(QString toFrame) { to = toFrame.toDouble(); }
     void okClicked();
 
 private:

@@ -25,10 +25,10 @@ public slots:
     void connected();
     void disconnected();
     void bytesWritten( qint64 bytes);
-    void readyRead();
-    void sendBlenderFile(frameListType f);
+    bool sendBlenderFile (frameListType f);
     void sendRenderedImage (QString filename);
     void sendKeepAlive();
+    void processReadyRead();
 
 private:
     QTcpSocket *socket;
@@ -37,6 +37,8 @@ private:
     int currentOperation;
     bool debug;
     dataStore *ds;
+    nodeAddresses serverInfo;
+    bool firstConnection;
 };
 
 #endif // NODE_H
