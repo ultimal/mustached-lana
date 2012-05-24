@@ -22,6 +22,9 @@ frmNode::frmNode(QWidget *parent,
     connect (ui->btnScheduledJobs,SIGNAL(clicked()),this,SLOT(openFile()));
     connect (toFrom,SIGNAL(sendFromFrame(double)),this,SLOT(setFromFrame(double)));
     connect (toFrom,SIGNAL(sendToFrame(double)),this,SLOT(setToFrame(double)));
+
+    // Prepare the TableWidget
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << tr("Job #") << tr("Filename") << tr("Progress"));
 }
 
 frmNode::~frmNode()

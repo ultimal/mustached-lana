@@ -1,3 +1,10 @@
+/*
+  * Node Default Port is:    2255
+  * Server Default Port is : 666
+  *
+  *
+*/
+
 #include <QtGui/QApplication>
 
 #include "getopt.h"
@@ -46,10 +53,10 @@ int main(int argc, char *argv[])
 
     QSettings settings;
 
-    QString serverIp = settings.value("Server/IP",ui->txtServerPublicIP);
-    QString serverPort = settings.value("Server/Port",ui->txtServerPort);
-    QString tempFolder = settings.value("Node/TempFolder",ui->txtTempFolder);
-    QString port = settings.value("Node/Port", ui->txtNodePort);
+    QString hostAddress = settings.value("Server/IP").toString();
+    QString serverPort = settings.value("Server/Port").toString();
+    QString tempFolder = settings.value("Node/TempFolder").toString();
+    QString port = settings.value("Node/Port").toString();
 
     /*
     QFile in("file.png");
@@ -61,12 +68,6 @@ int main(int argc, char *argv[])
     }
     in.close();
     out.close(); */
-
-    // Arguments from command-line parameters
-    QString port = settings.value("nodePort");
-
-    // Connect to this server if launched without arguments
-    QString hostAddress= settings.value("serverIP");
 
     // Command line options and flags
     static int isNode, isServer;
@@ -131,14 +132,17 @@ int main(int argc, char *argv[])
         // If the application was launched as Node but the port was not specified
         if (port=="0") {
             // Use the standard port
-            port="666";
+            port="2255";
         }
 
         // Launch in Node mode
         if (debug) { qDebug() << "Launching in NODE mode with DEFAULT port"; }
 
         // launchNodeDialog();
-        node = new frmNode(0,);
+        nodeAddresses na;
+        na.ipAddress = hostAddress;
+        na.port = "666";
+        node = new frmNode(0,port,na,debug);
         node->show();
     }
 
@@ -165,8 +169,8 @@ int main(int argc, char *argv[])
         n.port = "666";
 
         if (debug) { qDebug() << "Launching in INTERNET NODE mode using DEFAULT PORT and DEFAULT HOST ADDRESS";}
-        node = new frmNode (0,NULL,n,debug);
-        node.show();
+        node = new frmNode (0,port,n,debug);
+        node->show();
     }
 
     if (debug) { qDebug() << "isNode: " << isNode << " | host_address: " << hostAddress << " | port: " << port; }

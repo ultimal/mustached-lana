@@ -19,11 +19,11 @@ void nodeConnection::processReadyRead() {
         if (data=="GETQUEUEPOSITION") { currentOperation==OP_GETQUEUEPOSITION; }
     } else {
         if (currentOperation==OP_GETIMAGE) {
-            if (getImageFileOperation==IMG_SOURCEIP)        { img.node.ipAddress = this->readAll(); getImageFileOperation=IMG_SOURCEPORT; }
-            if (getImageFileOperation==IMG_SOURCEPORT)      { img.node.port = this->readAll(); getImageFileOperation=IMG_IMAGEFILENAME; }
-            if (getImageFileOperation==IMG_IMAGEFILENAME)   { img.imageFile = this->readAll(); getImageFileOperation=IMG_FRAMENUMBER; }
-            if (getImageFileOperation==IMG_FRAMENUMBER)     { img.frameNumber = this->readAll().toDouble(); getImageFileOperation=IMG_BLENDERFILENAME; }
-            if (getImageFileOperation==IMG_BLENDERFILENAME) { img.imageFile = this->readAll(); getImageFileOperation=IMG_IMAGEFILE; }
+            if (getImageFileOperation==IMG_SOURCEIP)        { img.node.ipAddress = this->readAll(); getImageFileOperation=IMG_SOURCEPORT; return; }
+            if (getImageFileOperation==IMG_SOURCEPORT)      { img.node.port = this->readAll(); getImageFileOperation=IMG_IMAGEFILENAME; return; }
+            if (getImageFileOperation==IMG_IMAGEFILENAME)   { img.imageFile = this->readAll(); getImageFileOperation=IMG_FRAMENUMBER; return; }
+            if (getImageFileOperation==IMG_FRAMENUMBER)     { img.frameNumber = this->readAll().toDouble(); getImageFileOperation=IMG_BLENDERFILENAME; return; }
+            if (getImageFileOperation==IMG_BLENDERFILENAME) { img.imageFile = this->readAll(); getImageFileOperation=IMG_IMAGEFILE; return; }
             if (getImageFileOperation==IMG_IMAGEFILE)       {
                 QFile imageFile(settings.value("ProjectPath").toString() + img.blenderFile + "/" + img.imageFile);
                 imageFile.open(QFile::WriteOnly);
@@ -56,13 +56,13 @@ void nodeConnection::processReadyRead() {
                     i++;
                 }
             }
+            return;
         }
-
         if (currentOperation==OP_GETBLENDERFILE) {
-            if (getBlenderFileOperation==BF_SOURCEIP)      {task.node.ipAddress = this->readAll();getBlenderFileOperation=BF_SOURCEPORT;}
-            if (getBlenderFileOperation==BF_SOURCEPORT)    {task.node.port = this->readAll();getBlenderFileOperation=BF_BLENDERFILENAME;}
-            if (getBlenderFileOperation==BF_BLENDERFILENAME) {task.blenderFile = this->readAll();getBlenderFileOperation=BF_FRAMENUMBER;}
-            if (getBlenderFileOperation==BF_FRAMENUMBER)   {task.frameNumber = this->readAll().toDouble();getBlenderFileOperation=BF_BLENDERFILE;}
+            task.node.ipAddress = this->peerAddress(); getBlenderFileOperation=BF_SOURCEPORT; return;
+            if (getBlenderFileOperation==BF_SOURCEPORT)    { task.node.port = this->readAll();getBlenderFileOperation=BF_BLENDERFILENAME; return;}
+            if (getBlenderFileOperation==BF_BLENDERFILENAME) { task.blenderFile = this->readAll();getBlenderFileOperation=BF_FRAMENUMBER; return; }
+            if (getBlenderFileOperation==BF_FRAMENUMBER)   { task.frameNumber = this->readAll().toDouble();getBlenderFileOperation=BF_BLENDERFILE; return; }
             if (getBlenderFileOperation==BF_BLENDERFILE)   {
                 // Download and save the file
                 // Saving a file
@@ -97,6 +97,10 @@ void nodeConnection::processReadyRead() {
                 getBlenderFileOperation=BF_NONE;
                 currentOperation=OP_NONE;
             }
+        }
+        if (currentOperation==OP_GETQUEUEPOSITION) {
+            // Receive Queue Position from Remote Node
+
         }
     }
 }

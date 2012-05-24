@@ -98,9 +98,8 @@ bool node::sendBlenderFile (frameListType f) {
             tmpSocket->write("GETBLENDERFILE");
             tmpSocket->flush();
 
-            // Send Local IP Address
-            tmpSocket->write(ds->getMyIP().toUtf8());
-            tmpSocket->flush();
+            // Since it is a public internet ip address the
+            // remote node needs to get my ip from its socket
 
             // Send Local Port
             tmpSocket->write(ds->getMyPort().toUtf8());
@@ -192,4 +191,16 @@ void node::sendKeepAlive() {
     // multiple computers on the same network
     socket->write(np.toUtf8());
     socket->flush();
+}
+
+void node::sendQueuePosition(nodeAddresses na, double position) {
+    // Send Queue Positions to all Client Nodes
+    socket->connectToHost(na.ipAddress,na.port);
+
+    if (socket->waitForConnected(10000)) {
+        socket->write ("GETQUEUEPOSITION");
+        socket->flush();
+        socket->write (QString::number(position));
+        socket->flush();
+    }
 }

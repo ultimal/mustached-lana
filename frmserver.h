@@ -14,7 +14,7 @@ class frmServer : public QWidget
     Q_OBJECT
 
 public:
-    explicit frmServer(QWidget *parent = 0, , QString port="666", bool debug=false);
+    explicit frmServer(QWidget *parent = 0, QString port="666", bool debug=false);
     ~frmServer();
 
 public slots:
@@ -22,7 +22,7 @@ public slots:
 
 private:
     Ui::frmServer *ui;
-    server *srv;
+    Server *srv;
     dataStore *data;
 
 };
