@@ -58,6 +58,16 @@ int main(int argc, char *argv[])
     QString tempFolder = settings.value("Node/TempFolder").toString();
     QString port = settings.value("Node/Port").toString();
 
+    if (port.length()<2) {
+        // Port is probably empty, set it to default
+        port = "666";
+    }
+
+    if (hostAddress.length()<2) {
+        // Host IP Address / name is probably empty
+        hostAddress = "127.0.0.1";
+    }
+
     /*
     QFile in("file.png");
     QFile out("NewFile.png");
@@ -142,7 +152,7 @@ int main(int argc, char *argv[])
         nodeAddresses na;
         na.ipAddress = hostAddress;
         na.port = "666";
-        node = new frmNode(0,port,na,debug);
+        node = new frmNode(0,hostAddress,port,na,debug);
         node->show();
     }
 
@@ -158,7 +168,7 @@ int main(int argc, char *argv[])
 
         if (debug) { qDebug() << "Launching in SERVER mode"; }
 
-        server = new frmServer(0,port,debug);
+        server = new frmServer(0,hostAddress,port,debug);
         server->show();
     }
 
@@ -169,7 +179,7 @@ int main(int argc, char *argv[])
         n.port = "666";
 
         if (debug) { qDebug() << "Launching in INTERNET NODE mode using DEFAULT PORT and DEFAULT HOST ADDRESS";}
-        node = new frmNode (0,port,n,debug);
+        node = new frmNode (0,hostAddress,port,n,debug);
         node->show();
     }
 

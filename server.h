@@ -15,6 +15,7 @@ public:
 
 signals:
     void newConnection(Connection *connection);
+    void connectionEstablished (nodeAddresses na);
 
 public slots:
     

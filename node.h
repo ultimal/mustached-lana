@@ -29,6 +29,7 @@ public slots:
     void sendRenderedImage (QString filename);
     void sendKeepAlive();
     void processReadyRead();
+    void sendQueuePosition(nodeAddresses na, double position);
 
 private:
     QTcpSocket *socket;

@@ -16,10 +16,10 @@ frmSettings::~frmSettings()
 // Save the settings and close the window
 void frmSettings::saveAndClose() {
     // Save all settings and close
-    settings.setValue("Server/IP",ui->txtServerPublicIP);
-    settings.setValue("Server/Port",ui->txtServerPort);
-    settings.setValue("Node/TempFolder",ui->txtTempFolder);
-    settings.setValue("Node/Port", ui->txtNodePort);
+    settings.setValue("Server/IP",ui->txtServerPublicIP->text());
+    settings.setValue("Server/Port",ui->txtServerPort->text());
+    settings.setValue("Node/TempFolder",ui->txtTempFolder->text());
+    settings.setValue("Node/Port", ui->txtNodePort->text());
 
     this->hide();
 }

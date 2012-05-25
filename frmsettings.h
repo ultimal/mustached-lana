@@ -15,6 +15,9 @@ class frmSettings : public QWidget
 public:
     explicit frmSettings(QWidget *parent = 0);
     ~frmSettings();
+
+public slots:
+    void saveAndClose();
     
 private:
     Ui::frmSettings *ui;

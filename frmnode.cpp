@@ -3,6 +3,7 @@
 #include <QFileDialog>
 
 frmNode::frmNode(QWidget *parent,
+                 QString ip,
                  QString nodePort,
                  nodeAddresses serverAddress,
                  bool d) :  QWidget(parent),  ui(new Ui::frmNode)

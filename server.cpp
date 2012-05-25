@@ -26,6 +26,15 @@ void Server::incomingConnection(int socketDescriptor) {
     if (debug) { qDebug() << "New incoming connection" << endl; }
 
     emit newConnection(connection);
+
+    // Send this information back to the window
+    nodeAddresses n;
+
+    n.ipAddress = connection->peerAddress().toString();
+    n.keepAlive = QTime::currentTime();
+    n.port = "0";
+
+    emit connectionEstablished(n);
 }
 
 void Server::setLocalDS (dataStore *ds) {

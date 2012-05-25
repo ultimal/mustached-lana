@@ -17,6 +17,7 @@ class frmNode : public QWidget
 
 public:
     explicit frmNode(QWidget *parent = 0,
+                     QString ip="127.0.0.1",
                      QString nodePort="666",
                      nodeAddresses serverAddress=nodeAddresses(),
                      bool d=false );

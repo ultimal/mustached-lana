@@ -13,10 +13,9 @@ node::node(QObject *parent, QString nodePort, dataStore *ds, nodeAddresses serve
 
     connect (socket,SIGNAL(connected()),this,SLOT(connected()));
     connect (socket,SIGNAL(disconnected()),this,SLOT(disconnected()));
-    connect (socket,SIGNAL(bytesWritten(qint64)),this,SLOT(bytesWritten(qint64)));
-    connect (socket,SIGNAL(readyRead()),this,SLOT(readyRead()));
+    connect (socket,SIGNAL(readyRead()),this,SLOT(processReadyRead()));
 
-    socket->connectToHost(serverAddress.ipAddress, serverAddress.port.toInt());
+    socket->connectToHost(serverAddress.ipAddress, serverAddress.port.toShort());
 
     // TODO: Server connect timeout needs to be a user set thing
     if (!socket->waitForConnected(10000)) {
@@ -195,12 +194,12 @@ void node::sendKeepAlive() {
 
 void node::sendQueuePosition(nodeAddresses na, double position) {
     // Send Queue Positions to all Client Nodes
-    socket->connectToHost(na.ipAddress,na.port);
+    socket->connectToHost(na.ipAddress,na.port.toShort());
 
     if (socket->waitForConnected(10000)) {
         socket->write ("GETQUEUEPOSITION");
         socket->flush();
-        socket->write (QString::number(position));
+        socket->write (QString::number(position).toUtf8());
         socket->flush();
     }
 }

@@ -59,7 +59,7 @@ void nodeConnection::processReadyRead() {
             return;
         }
         if (currentOperation==OP_GETBLENDERFILE) {
-            task.node.ipAddress = this->peerAddress(); getBlenderFileOperation=BF_SOURCEPORT; return;
+            task.node.ipAddress = this->peerAddress().toString(); getBlenderFileOperation=BF_SOURCEPORT; return;
             if (getBlenderFileOperation==BF_SOURCEPORT)    { task.node.port = this->readAll();getBlenderFileOperation=BF_BLENDERFILENAME; return;}
             if (getBlenderFileOperation==BF_BLENDERFILENAME) { task.blenderFile = this->readAll();getBlenderFileOperation=BF_FRAMENUMBER; return; }
             if (getBlenderFileOperation==BF_FRAMENUMBER)   { task.frameNumber = this->readAll().toDouble();getBlenderFileOperation=BF_BLENDERFILE; return; }
