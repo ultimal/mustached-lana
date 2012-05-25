@@ -27,8 +27,13 @@ void Connection::processReadyRead() {
     } else {
         // Waiting for port number from the node
         if (currentOperation==REGISTER) {
+            // Register the new node
+            newNode.ipAddress = this->peerAddress().toString();
             newNode.port = this->readAll();
+            newNode.keepAlive = QTime::currentTime();
+
             ds->nodeAppend(newNode);
+
             currentOperation==NONE;
         }
         if (currentOperation==DB) {sendDB();}

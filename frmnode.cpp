@@ -25,7 +25,11 @@ frmNode::frmNode(QWidget *parent,
     connect (toFrom,SIGNAL(sendToFrame(double)),this,SLOT(setToFrame(double)));
 
     // Prepare the TableWidget
+    ui->tableWidget->setColumnCount(3);
+    ui->tableWidget->setRowCount(0);
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << tr("Job #") << tr("Filename") << tr("Progress"));
+    ui->tableWidget->setColumnWidth(1,300);
+
 }
 
 frmNode::~frmNode()
