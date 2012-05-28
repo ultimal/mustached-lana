@@ -79,15 +79,17 @@ void dataStore::taskRemove(taskListType task) {
 
 // Update Task
 double dataStore::taskGetQueuePosition(taskListType task) {
-    for (double i=0; i<=taskList.count(); i++) {
+    double i = 0;
+    for (i=0; i<=taskList.count(); i++) {
         if ((taskList.at(i).node.ipAddress == task.node.ipAddress) &&
             (taskList.at(i).node.port == task.node.port) &&
             (taskList.at(i).blenderFile == task.blenderFile) &&
             (taskList.at(i).frameNumber == task.frameNumber)){
             // If the correct frame is found in the task list
-        return i;
+            return i;
         }
     }
+    return i;
 }
 
 // Job: Append
@@ -136,11 +138,13 @@ void dataStore::jobFrameUpdate(frameListType frame) {
 
 // Job: Next available frame for scheduling
 frameListType dataStore::jobGetNextFrame() {
+    frameListType frame;
     for (double i=0; i<=jobFrameList.count(); i++) {
         if (jobFrameList.at(i).node.ipAddress == "") {
             // If there is no node assigned to a frame return that frame
-            frameListType frame = jobFrameList.at(i);
+            frame = jobFrameList.at(i);
             return frame;
         }
     }
+    return frame;
 }

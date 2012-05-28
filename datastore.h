@@ -61,6 +61,8 @@ public:
 
     QString getMyPort() { return myPort; }
 
+    double nodeCount() { return na.count(); }
+
 signals:
     
 public slots:

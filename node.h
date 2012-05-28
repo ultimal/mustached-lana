@@ -21,6 +21,9 @@ public:
         KEEPALIVE
     };
 
+signals:
+    void dbComplete();
+
 public slots:
     void connected();
     void disconnected();

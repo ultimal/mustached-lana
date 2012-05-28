@@ -17,7 +17,7 @@ public:
     enum dataType {                     // What type of data was sent
         REGISTER,                       // Register with server
         PING,                           // Ping the server
-        DB,                             // Server is sending the DB
+        SENDDB,                         // Server is sending the DB
         IMAGE,                          // Node sending rendered image
         BLENDERFILE,                    // Node sending blender file to be rendered
         QUEUEPOSITION,                  // Job Queue Position
@@ -25,7 +25,7 @@ public:
         KEEPALIVE                       // Keep alive request
     };
 
-    explicit Connection(QObject *parent = 0);
+    explicit Connection(QObject *parent = 0, dataStore *dataS = 0, bool d = false);
     void setLocalDS (dataStore *data) { ds = data; }
 
 signals:
@@ -39,6 +39,7 @@ private:
     dataStore *ds;
     nodeAddresses newNode;
     int currentOperation;
+    bool debug;
 };
 
 #endif // CONNECTION_H

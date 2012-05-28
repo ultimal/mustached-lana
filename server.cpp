@@ -9,7 +9,7 @@ Server::Server(QObject *parent, QString port, dataStore *ds, bool d) :
     debug = d;
 
     // Get pointer to the dataStore object
-    setLocalDS (ds);
+    data = ds;
 
     if (listen(QHostAddress::Any,port.toInt())) {
         if (debug) { qDebug() << "Listening on port 666" << endl; }
@@ -17,7 +17,7 @@ Server::Server(QObject *parent, QString port, dataStore *ds, bool d) :
 }
 
 void Server::incomingConnection(int socketDescriptor) {
-    Connection *connection = new Connection(this);
+    Connection *connection = new Connection(this, data, debug);
     connection->setSocketDescriptor(socketDescriptor);
 
     // Pass pointer to the dataStore object
@@ -37,6 +37,3 @@ void Server::incomingConnection(int socketDescriptor) {
     emit connectionEstablished(n);
 }
 
-void Server::setLocalDS (dataStore *ds) {
-    data = ds;
-}

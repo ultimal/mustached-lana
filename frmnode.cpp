@@ -15,6 +15,7 @@ frmNode::frmNode(QWidget *parent,
 
     ds = new dataStore(this);
 
+    // Connect to server and get dataStore
     n = new node(this, nodePort, ds, serverAddress , true);
 
     ds->setMyPort(nodePort);
@@ -23,6 +24,7 @@ frmNode::frmNode(QWidget *parent,
     connect (ui->btnScheduledJobs,SIGNAL(clicked()),this,SLOT(openFile()));
     connect (toFrom,SIGNAL(sendFromFrame(double)),this,SLOT(setFromFrame(double)));
     connect (toFrom,SIGNAL(sendToFrame(double)),this,SLOT(setToFrame(double)));
+    connect (n,SIGNAL(dbComplete()),this,SLOT(updateNodeCount()));
 
     // Prepare the TableWidget
     ui->tableWidget->setColumnCount(3);
@@ -35,6 +37,10 @@ frmNode::frmNode(QWidget *parent,
 frmNode::~frmNode()
 {
     delete ui;
+}
+
+void frmNode::updateNodeCount() {
+    ui->txtNodes->setText(QString::number(ds->nodeCount()));
 }
 
 void frmNode::scheduleJob() {

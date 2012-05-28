@@ -14,9 +14,9 @@ void nodeConnection::getQueuePosition (nodeAddresses na) {
 void nodeConnection::processReadyRead() {
     if (currentOperation==OP_NONE) {
         QString data = readAll();
-        if (data=="GETIMAGE") { currentOperation==OP_GETIMAGE; }
-        if (data=="GETBLENDERFILE") { currentOperation==OP_GETBLENDERFILE; }
-        if (data=="GETQUEUEPOSITION") { currentOperation==OP_GETQUEUEPOSITION; }
+        if (data=="GETIMAGE") { currentOperation=OP_GETIMAGE; }
+        if (data=="GETBLENDERFILE") { currentOperation=OP_GETBLENDERFILE; }
+        if (data=="GETQUEUEPOSITION") { currentOperation=OP_GETQUEUEPOSITION; }
     } else {
         if (currentOperation==OP_GETIMAGE) {
             if (getImageFileOperation==IMG_SOURCEIP)        { img.node.ipAddress = this->readAll(); getImageFileOperation=IMG_SOURCEPORT; return; }

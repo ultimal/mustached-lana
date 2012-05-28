@@ -32,6 +32,7 @@ public slots:
 
     void setFromFrame(double fromFrame) { from = fromFrame; }
     void setToFrame (double toFrame) { to = toFrame; }
+    void updateNodeCount ();
 
 private:
     Ui::frmNode *ui;

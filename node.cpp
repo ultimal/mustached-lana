@@ -26,7 +26,7 @@ node::node(QObject *parent, QString nodePort, dataStore *ds, nodeAddresses serve
 
     np = nodePort;
 
-    currentOperation == NONE;
+    currentOperation = NONE;
 
     // Start the nodeServer
     ns = new nodeServer(this, np, ds, debug);
@@ -42,24 +42,57 @@ void node::connected() {
     if (firstConnection) {
         // Once connected send the COMMAND to the server
         socket->write("REGISTER");
-        socket->flush();
+        socket->flush(); if (debug) { qDebug() << "REGISTER: Request sent..."; }
 
         // Now send the node PORT for registration with the server
-        QByteArray block;
-        QDataStream out(&block, QIODevice::WriteOnly);
-        out << np;
-        socket->write(block);
-        socket->flush();
+        socket->write(np.toUtf8());
+        socket->flush(); if (debug) { qDebug() << "REGISTER: PORT: Sent..."; }
 
         // Now request the database
         socket->write("SENDDB");
-        socket->flush();
+        socket->flush(); if (debug) { qDebug() << "SENDDB: Request sent..."; }
+
+        currentOperation = SENDDB;
 
         firstConnection = false;
     }
 
     // Do whatever else for all subsequent connections
 
+}
+
+void node::processReadyRead() {
+    // Get Data Store from server
+    if (currentOperation==SENDDB) {
+        // Read the DB
+        QByteArray block;
+        QDataStream out(&block, QIODevice::WriteOnly);
+
+        QVector<nodeAddresses> nodeList;
+        nodeAddresses node;
+
+        out << socket->readAll();
+
+        while (!out.atEnd()) {
+            out >> node;
+            ds->nodeAppend(node);
+        }
+
+        currentOperation=NONE;
+
+        emit dbComplete();
+    }
+}
+
+void node::sendKeepAlive() {
+
+    socket->write("KEEPALIVE");
+    socket->flush();
+
+    // Send the port number, since that is what differentiates
+    // multiple computers on the same network
+    socket->write(np.toUtf8());
+    socket->flush();
 }
 
 // Called when disconnected
@@ -152,45 +185,6 @@ void node::sendRenderedImage (QString filename) {
     qDebug() << "Writing file out to disk.";
     sample.close(); */
 // }
-
-void node::processReadyRead() {
-    // Get Data Store from server
-    QString tmp = socket->readAll();
-    if (currentOperation==NONE) {
-        if (tmp=="SENDDB") { currentOperation = SENDDB; }
-    } else {
-        if (currentOperation==SENDDB) {
-            // Read the DB
-            QByteArray block;
-            QDataStream out(&block, QIODevice::WriteOnly);
-
-            int i = 0;
-
-            QVector<nodeAddresses> nodeList;
-            nodeAddresses node;
-
-            out << socket->readAll();
-
-            while (!out.atEnd()) {
-                out >> node;
-                ds->nodeAppend(node);
-            }
-
-            currentOperation == NONE;
-        }
-    }
-}
-
-void node::sendKeepAlive() {
-
-    socket->write("KEEPALIVE");
-    socket->flush();
-
-    // Send the port number, since that is what differentiates
-    // multiple computers on the same network
-    socket->write(np.toUtf8());
-    socket->flush();
-}
 
 void node::sendQueuePosition(nodeAddresses na, double position) {
     // Send Queue Positions to all Client Nodes
