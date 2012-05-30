@@ -27,6 +27,8 @@ public:
 
     explicit Connection(QObject *parent = 0, dataStore *dataS = 0, bool d = false);
     void setLocalDS (dataStore *data) { ds = data; }
+    bool compareTo (QString stringToLookFor, QByteArray b);
+    void sendACK ();
 
 signals:
     void keepAlive(nodeAddresses node);

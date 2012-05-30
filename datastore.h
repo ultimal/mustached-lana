@@ -61,7 +61,7 @@ public:
 
     QString getMyPort() { return myPort; }
 
-    double nodeCount() { return na.count(); }
+    QString nodeCount();
 
 signals:
     

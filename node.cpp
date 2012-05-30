@@ -15,22 +15,25 @@ node::node(QObject *parent, QString nodePort, dataStore *ds, nodeAddresses serve
     connect (socket,SIGNAL(disconnected()),this,SLOT(disconnected()));
     connect (socket,SIGNAL(readyRead()),this,SLOT(processReadyRead()));
 
-    socket->connectToHost(serverAddress.ipAddress, serverAddress.port.toShort());
-
-    // TODO: Server connect timeout needs to be a user set thing
-    if (!socket->waitForConnected(10000)) {
-        if (debug) { qDebug() << "Server not found"; }
-    } else {
-        if (debug) { qDebug() << "Node started..." << endl; }
-    }
-
     np = nodePort;
 
     currentOperation = NONE;
+    waitForACK = false;
 
     // Start the nodeServer
     ns = new nodeServer(this, np, ds, debug);
 
+    socket->connectToHost(serverAddress.ipAddress, serverAddress.port.toShort());
+
+}
+
+// Verify if ACK was received
+bool node::gotACK(QByteArray b) {
+    if (QString::fromUtf8(b) == "ACK" ) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 // Called connected
@@ -41,18 +44,10 @@ void node::connected() {
     // If this is this sockets first Connection to the server
     if (firstConnection) {
         // Once connected send the COMMAND to the server
-        socket->write("REGISTER");
-        socket->flush(); if (debug) { qDebug() << "REGISTER: Request sent..."; }
+        socket->write(tr("REGISTER").toUtf8());                    if (debug) { qDebug() << "REGISTER: Request sent..."; }
 
-        // Now send the node PORT for registration with the server
-        socket->write(np.toUtf8());
-        socket->flush(); if (debug) { qDebug() << "REGISTER: PORT: Sent..."; }
-
-        // Now request the database
-        socket->write("SENDDB");
-        socket->flush(); if (debug) { qDebug() << "SENDDB: Request sent..."; }
-
-        currentOperation = SENDDB;
+        currentOperation = REGISTER;
+        waitForACK = true;
 
         firstConnection = false;
     }
@@ -63,7 +58,15 @@ void node::connected() {
 
 void node::processReadyRead() {
     // Get Data Store from server
-    if (currentOperation==SENDDB) {
+    if (waitForACK && gotACK(socket->readAll()) && currentOperation==REGISTER) {
+
+        // Now send the node PORT for registration with the server
+        socket->write(np.toUtf8());                             if (debug) { qDebug() << "REGISTER: PORT: " << np << " Sent..."; }
+
+        currentOperation = RECEIVEDB;
+    }
+
+    if (currentOperation==RECEIVEDB) {
         // Read the DB
         QByteArray block;
         QDataStream out(&block, QIODevice::WriteOnly);
@@ -74,9 +77,11 @@ void node::processReadyRead() {
         out << socket->readAll();
 
         while (!out.atEnd()) {
-            out >> node;
+            out >> node;                                        if (debug) { qDebug() << "SENDDB: Received: " << node.ipAddress << ":" << node.port << " - " << node.keepAlive; }
             ds->nodeAppend(node);
         }
+
+        if (debug) { qDebug() << "SENDDB: dataStore Count: " << ds->nodeCount(); }
 
         currentOperation=NONE;
 

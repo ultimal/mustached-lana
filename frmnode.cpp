@@ -40,7 +40,7 @@ frmNode::~frmNode()
 }
 
 void frmNode::updateNodeCount() {
-    ui->txtNodes->setText(QString::number(ds->nodeCount()));
+    ui->txtNodes->setText(ds->nodeCount());
 }
 
 void frmNode::scheduleJob() {

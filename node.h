@@ -15,11 +15,14 @@ public:
     
     enum operations {
         NONE,
-        SENDDB,
+        REGISTER,
+        RECEIVEDB,
         SENDIMAGE,
         SENDBLENDERFILE,
         KEEPALIVE
     };
+
+    bool gotACK(QByteArray b);
 
 signals:
     void dbComplete();
@@ -43,6 +46,7 @@ private:
     dataStore *ds;
     nodeAddresses serverInfo;
     bool firstConnection;
+    bool waitForACK;
 };
 
 #endif // NODE_H

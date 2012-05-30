@@ -5,6 +5,12 @@ dataStore::dataStore(QObject *parent) : QObject(parent)
 
 }
 
+// Return total nodes in dataStore
+QString dataStore::nodeCount() {
+    QString count = QString::number(na.count());
+     return count;
+}
+
 nodeAddresses dataStore::nodeGetNext() {
     nodeAddresses node;
     node.ipAddress = na[currentNode].ipAddress;
