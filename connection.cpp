@@ -28,19 +28,26 @@ void Connection::sendACK() {
 }
 
 void Connection::processReadyRead() {
-    QString msg = QString::fromUtf8(this->readAll());    if (debug) { qDebug() << "RECEIVED: " << msg; }
+    // Byte Array needs to be converted back to utf8 format to be comparable with QStrings
+    QString msg = QString::fromUtf8(this->readAll());                       if (debug) { qDebug() << "RECEIVED: " << msg; }
+
     // currentOperation is NONE then look for a command otherwise get data
     if (currentOperation==NONE) {
+
         // Register with the server
         if (msg=="REGISTER") {
             currentOperation = REGISTER;
             sendACK();                                                      if (debug) { qDebug() << "REGISTER request received."; }}
+
         // Asking server to send a copy of the node DB
-        if (compareTo("SENDDB",this->readAll())) {
+        if (msg=="SENDDB") {
             currentOperation = SENDDB;                                      if (debug) { qDebug() << "SENDDB request received."; }}
-        if (compareTo("KEEPALIVE",this->readAll())) {
+
+        if (msg=="KEEPALIVE") {
             currentOperation = KEEPALIVE;                                   if (debug) { qDebug() << "KEEPALIVE request received."; }}
+
     } else {
+
         // Waiting for port number from the node
         if (currentOperation==REGISTER) {
                                                                             if (debug) { qDebug() << "REGISTER: Starting..."; }
@@ -48,11 +55,8 @@ void Connection::processReadyRead() {
             newNode.ipAddress = this->peerAddress().toString();             if (debug) { qDebug() << "REGISTER: peerAddress: " << newNode.ipAddress; }
             newNode.port = msg;                                             if (debug) { qDebug() << "REGISTER: PORT: " << newNode.port; }
             newNode.keepAlive = QTime::currentTime();                       if (debug) { qDebug() << "REGISTER: KEEPALIVE: " << newNode.keepAlive.toString(); }
-
             ds->nodeAppend(newNode);                                        if (debug) { qDebug() << "REGISTER: appended to dataStore."; }
-
             currentOperation=NONE;                                          if (debug) { qDebug() << "REGISTER: complete."; }
-
             sendDB();
         }
 
@@ -99,20 +103,27 @@ void Connection::sendDB() {
         i++;
     }
 
-    write(block);                                                           if (debug) { qDebug() << "SENDDB: complete."; }
-    this->close();                                                          if (debug) { qDebug() << "Connection closed."; }
+    if (this->write(block)==-1) {
+                                                                            if (debug) { qDebug() << "SENDDB: Send failed."; }
+    } else {
+                                                                            if (debug) { qDebug() << "SENDDB: complete."; }
+    }
+
+    this->flush();
+    //this->close();                                                          if (debug) { qDebug() << "Connection closed."; }
 }
 
 QDataStream &operator <<(QDataStream &stream, const nodeAddresses &myclass) {
-    stream << myclass.ipAddress;
-    stream << myclass.port;
-    stream << myclass.keepAlive;
+    stream << myclass.ipAddress << stream << myclass.port << stream << myclass.keepAlive;
     return stream;
 }
 
 QDataStream &operator >>(QDataStream &stream, nodeAddresses &myclass) {
-    stream >> myclass.ipAddress;
-    stream >> myclass.port;
-    stream >> myclass.keepAlive;
+    QString data;
+    QTime tData;
+
+    stream >> data; myclass.ipAddress = data;
+    stream >> data; myclass.port = data;
+    stream >> tData; myclass.keepAlive = tData;
     return stream;
 }

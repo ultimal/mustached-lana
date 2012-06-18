@@ -58,15 +58,10 @@ int main(int argc, char *argv[])
     QString tempFolder = settings.value("Node/TempFolder").toString();
     QString port = settings.value("Node/Port").toString();
 
-    if (port.length()<2) {
-        // Port is probably empty, set it to default
-        port = "666";
-    }
-
-    if (hostAddress.length()<2) {
-        // Host IP Address / name is probably empty
-        hostAddress = "127.0.0.1";
-    }
+    // Port is probably empty, set it to default
+    if (port.length()<2)        { port = "2255"; }
+    if (serverPort.length()<2)  { serverPort = "666"; }
+    if (hostAddress.length()<2) { hostAddress = "127.0.0.1"; }
 
     /*
     QFile in("file.png");
@@ -124,7 +119,7 @@ int main(int argc, char *argv[])
             break;
         case 'p':
             // Get the port value from the command line
-            port = optarg;
+            if (isServer=1) { serverPort = optarg; } else { port = optarg; }
             break;
         case '?':
             print_usage(stderr, 1);
@@ -139,11 +134,6 @@ int main(int argc, char *argv[])
 
     // If launched as node
     if (isNode) {
-        // If the application was launched as Node but the port was not specified
-        if (port=="0") {
-            // Use the standard port
-            port="2255";
-        }
 
         // Launch in Node mode
         if (debug) { qDebug() << "Launching in NODE mode with DEFAULT port"; }
@@ -151,7 +141,7 @@ int main(int argc, char *argv[])
         // launchNodeDialog();
         nodeAddresses na;
         na.ipAddress = hostAddress;
-        na.port = "666";
+        na.port = port;
         node = new frmNode(0,hostAddress,port,na,debug);
         node->show();
     }
@@ -159,16 +149,9 @@ int main(int argc, char *argv[])
     // If launched as server
     if (isServer) {
 
-        // If the port was not specified use standard port
-        if (port=="0") {
-            port = "666";
-
-            if (debug) { qDebug() << "Launching in SERVER mode with DEFAULT port."; }
-        }
-
         if (debug) { qDebug() << "Launching in SERVER mode"; }
 
-        server = new frmServer(0,hostAddress,port,debug);
+        server = new frmServer(0,hostAddress,serverPort,debug);
         server->show();
     }
 
@@ -176,9 +159,10 @@ int main(int argc, char *argv[])
     if ((!isNode) && (!isServer)) {
         nodeAddresses n;
         n.ipAddress = "127.0.0.1";
-        n.port = "666";
+        n.port = serverPort;
 
         if (debug) { qDebug() << "Launching in INTERNET NODE mode using DEFAULT PORT and DEFAULT HOST ADDRESS";}
+
         node = new frmNode (0,hostAddress,port,n,debug);
         node->show();
     }

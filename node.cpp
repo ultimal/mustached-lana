@@ -21,10 +21,15 @@ node::node(QObject *parent, QString nodePort, dataStore *ds, nodeAddresses serve
     waitForACK = false;
 
     // Start the nodeServer
-    ns = new nodeServer(this, np, ds, debug);
+    ns = new nodeServer (this, np, ds, debug);
 
-    socket->connectToHost(serverAddress.ipAddress, serverAddress.port.toShort());
+    socket->connectToHost (serverAddress.ipAddress, serverAddress.port.toShort());
 
+    if (socket->waitForConnected(3000)==false) {
+        // If unable to connect
+        if (debug) { qDebug() << "NODE: Unable to connect: " << serverInfo.ipAddress << ":" << serverInfo.port; }
+        qApp->quit();
+    }
 }
 
 // Verify if ACK was received
@@ -57,16 +62,9 @@ void node::connected() {
 }
 
 void node::processReadyRead() {
-    // Get Data Store from server
-    if (waitForACK && gotACK(socket->readAll()) && currentOperation==REGISTER) {
-
-        // Now send the node PORT for registration with the server
-        socket->write(np.toUtf8());                             if (debug) { qDebug() << "REGISTER: PORT: " << np << " Sent..."; }
-
-        currentOperation = RECEIVEDB;
-    }
-
+                                                                if (debug) { qDebug() << "Data Received: Processing"; }
     if (currentOperation==RECEIVEDB) {
+                                                                if (debug) { qDebug() << "SENDDB: Reading DB"; }
         // Read the DB
         QByteArray block;
         QDataStream out(&block, QIODevice::WriteOnly);
@@ -82,11 +80,24 @@ void node::processReadyRead() {
         }
 
         if (debug) { qDebug() << "SENDDB: dataStore Count: " << ds->nodeCount(); }
-
         currentOperation=NONE;
-
         emit dbComplete();
     }
+
+    // Get Data Store from server
+    if (waitForACK && currentOperation==REGISTER) {
+        if (gotACK(socket->readAll())) {
+
+            waitForACK = false;
+
+            // Now send the node PORT for registration with the server
+            socket->write(np.toUtf8());                         if (debug) { qDebug() << "REGISTER: PORT: " << np << " Sent..."; }
+
+            currentOperation = RECEIVEDB;
+        }
+    }
+
+
 }
 
 void node::sendKeepAlive() {

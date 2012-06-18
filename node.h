@@ -10,6 +10,7 @@
 class node : public QObject
 {
     Q_OBJECT
+
 public:
     explicit node(QObject *parent=0, QString nodePort="666", dataStore *ds=0, nodeAddresses nodeA=nodeAddresses(), bool d=false );
     
@@ -23,6 +24,7 @@ public:
     };
 
     bool gotACK(QByteArray b);
+    bool sendBlenderFile (frameListType f);
 
 signals:
     void dbComplete();
@@ -31,11 +33,10 @@ public slots:
     void connected();
     void disconnected();
     void bytesWritten( qint64 bytes);
-    bool sendBlenderFile (frameListType f);
     void sendRenderedImage (QString filename);
+    void sendQueuePosition (nodeAddresses na, double position);
     void sendKeepAlive();
     void processReadyRead();
-    void sendQueuePosition(nodeAddresses na, double position);
 
 private:
     QTcpSocket *socket;
@@ -44,9 +45,9 @@ private:
     int currentOperation;
     bool debug;
     dataStore *ds;
-    nodeAddresses serverInfo;
     bool firstConnection;
     bool waitForACK;
+    nodeAddresses serverInfo;
 };
 
 #endif // NODE_H

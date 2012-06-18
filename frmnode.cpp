@@ -53,7 +53,7 @@ void frmNode::scheduleJob() {
     ds->jobAppend(j);
 
     // Get next available node and schedule job
-    double i;
+    double i=0;
     while (i<=j.totalFrames) {
         frameListType frame;
         frame.blenderFile = blenderFilename;
