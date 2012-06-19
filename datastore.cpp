@@ -154,3 +154,20 @@ frameListType dataStore::jobGetNextFrame() {
     }
     return frame;
 }
+
+QDataStream &operator <<(QDataStream &stream, const nodeAddresses &myclass) {
+    stream << myclass.ipAddress;
+    stream << myclass.port;
+    stream << myclass.keepAlive;
+    return stream;
+}
+
+QDataStream &operator >>(QDataStream &stream, nodeAddresses &myclass) {
+    QString data;
+    QTime tData;
+
+    stream >> data; myclass.ipAddress = data;
+    stream >> data; myclass.port = data;
+    stream >> tData; myclass.keepAlive = tData;
+    return stream;
+}

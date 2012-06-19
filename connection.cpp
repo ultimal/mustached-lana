@@ -92,38 +92,24 @@ void Connection::sendDB() {
     } */
 
     QByteArray block;
-    QDataStream out(&block, QIODevice::ReadOnly);
+    QDataStream out(&block, QIODevice::ReadWrite);
 
     int i = 0;
 
     QVector<nodeAddresses> nodes = ds->getNodeList();
 
     while (i<nodes.count()) {
-        out << nodes.at(i);                                                 if (debug) { qDebug() << "SENDDB: " << nodes[i].ipAddress << ":" << nodes[i].port << " - " << nodes[i].keepAlive; }
+        out << nodes[i];                                                    if (debug) { qDebug() << "SENDDB: " << nodes[i].ipAddress << ":" << nodes[i].port << " - " << nodes[i].keepAlive; }
         i++;
     }
 
-    if (this->write(block)==-1) {
+    if (write(block)==-1) {
                                                                             if (debug) { qDebug() << "SENDDB: Send failed."; }
     } else {
                                                                             if (debug) { qDebug() << "SENDDB: complete."; }
     }
 
-    this->flush();
-    //this->close();                                                          if (debug) { qDebug() << "Connection closed."; }
+    this->close();                                                          if (debug) { qDebug() << "Connection closed."; }
 }
 
-QDataStream &operator <<(QDataStream &stream, const nodeAddresses &myclass) {
-    stream << myclass.ipAddress << stream << myclass.port << stream << myclass.keepAlive;
-    return stream;
-}
 
-QDataStream &operator >>(QDataStream &stream, nodeAddresses &myclass) {
-    QString data;
-    QTime tData;
-
-    stream >> data; myclass.ipAddress = data;
-    stream >> data; myclass.port = data;
-    stream >> tData; myclass.keepAlive = tData;
-    return stream;
-}

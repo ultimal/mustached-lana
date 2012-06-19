@@ -67,7 +67,7 @@ void node::processReadyRead() {
                                                                 if (debug) { qDebug() << "SENDDB: Reading DB"; }
         // Read the DB
         QByteArray block;
-        QDataStream out(&block, QIODevice::WriteOnly);
+        QDataStream out(&block, QIODevice::ReadWrite);
 
         QVector<nodeAddresses> nodeList;
         nodeAddresses node;
@@ -96,8 +96,6 @@ void node::processReadyRead() {
             currentOperation = RECEIVEDB;
         }
     }
-
-
 }
 
 void node::sendKeepAlive() {
@@ -207,7 +205,7 @@ void node::sendQueuePosition(nodeAddresses na, double position) {
     socket->connectToHost(na.ipAddress,na.port.toShort());
 
     if (socket->waitForConnected(10000)) {
-        socket->write ("GETQUEUEPOSITION");
+        socket->write (QString("GETQUEUEPOSITION").toUtf8());
         socket->flush();
         socket->write (QString::number(position).toUtf8());
         socket->flush();

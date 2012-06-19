@@ -6,9 +6,6 @@
 #include <QDebug>
 #include "datastore.h"
 
-QDataStream &operator <<(QDataStream &stream, const nodeAddresses &myclass);
-QDataStream &operator >>(QDataStream &stream, nodeAddresses &myclass);
-
 class Connection : public QTcpSocket {
 
     Q_OBJECT

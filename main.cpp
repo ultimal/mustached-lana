@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
             break;
         case 'p':
             // Get the port value from the command line
-            if (isServer=1) { serverPort = optarg; } else { port = optarg; }
+            if (isServer==1) { serverPort = optarg; } else { port = optarg; }
             break;
         case '?':
             print_usage(stderr, 1);

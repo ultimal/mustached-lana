@@ -31,6 +31,9 @@ struct taskListType {
     double          frameNumber;
 };
 
+QDataStream &operator <<(QDataStream &stream, const nodeAddresses &myclass);
+QDataStream &operator >>(QDataStream &stream, nodeAddresses &myclass);
+
 class dataStore : public QObject
 {
     Q_OBJECT
