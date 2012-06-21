@@ -71,7 +71,7 @@ signals:
 public slots:
 
     // Used by connection to append a new Node to the data store
-    void nodeAppend(nodeAddresses node);
+    void nodeAppend(nodeAddresses *node);
 
     // Remove dead nodes
     void removeDeadNodes();

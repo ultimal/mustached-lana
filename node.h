@@ -48,6 +48,7 @@ private:
     bool firstConnection;
     bool waitForACK;
     nodeAddresses serverInfo;
+    bool outEmpty;
 };
 
 #endif // NODE_H

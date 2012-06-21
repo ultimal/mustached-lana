@@ -55,7 +55,7 @@ void Connection::processReadyRead() {
             newNode.ipAddress = this->peerAddress().toString();             if (debug) { qDebug() << "REGISTER: peerAddress: " << newNode.ipAddress; }
             newNode.port = msg;                                             if (debug) { qDebug() << "REGISTER: PORT: " << newNode.port; }
             newNode.keepAlive = QTime::currentTime();                       if (debug) { qDebug() << "REGISTER: KEEPALIVE: " << newNode.keepAlive.toString(); }
-            ds->nodeAppend(newNode);                                        if (debug) { qDebug() << "REGISTER: appended to dataStore."; }
+            ds->nodeAppend(&newNode);                                        if (debug) { qDebug() << "REGISTER: appended to dataStore."; }
             currentOperation=NONE;                                          if (debug) { qDebug() << "REGISTER: complete."; }
             sendDB();
         }
@@ -93,7 +93,7 @@ void Connection::sendDB() {
 
     QByteArray block;
     QDataStream out(&block, QIODevice::ReadWrite);
-
+    out.setVersion(QDataStream::Qt_4_0);
     int i = 0;
 
     QVector<nodeAddresses> nodes = ds->getNodeList();

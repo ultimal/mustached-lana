@@ -67,20 +67,32 @@ void node::processReadyRead() {
                                                                 if (debug) { qDebug() << "SENDDB: Reading DB"; }
         // Read the DB
         QByteArray block;
-        QDataStream out(&block, QIODevice::ReadWrite);
 
-        QVector<nodeAddresses> nodeList;
         nodeAddresses node;
 
-        out << socket->readAll();
+        block = socket->readAll();
 
-        while (!out.atEnd()) {
-            out >> node;                                        if (debug) { qDebug() << "SENDDB: Received: " << node.ipAddress << ":" << node.port << " - " << node.keepAlive; }
-            ds->nodeAppend(node);
+        QDataStream out(&block, QIODevice::ReadOnly);
+        out.setVersion(QDataStream::Qt_4_0);
+
+        if (out.atEnd()) {                                      if (debug) { qDebug() << "SENDDB: No data received."; }
+            outEmpty = true;
+        } else {
+            outEmpty = false;
         }
 
-        if (debug) { qDebug() << "SENDDB: dataStore Count: " << ds->nodeCount(); }
+        int i = 0;
+        while (!out.atEnd()) {
+                                                                if (debug) { qDebug() << "SENDDB: Reading (" << i << ")"; }
+            out >> node;                                        if (debug) { qDebug() << "SENDDB: Received: " << node.ipAddress << ":" << node.port << " - " << node.keepAlive; }
+            ds->nodeAppend(&node);
+            i++;
+        }
+
+                                                                if (debug && !outEmpty) { qDebug() << "SENDDB: dataStore Count: " << ds->nodeCount(); }
+
         currentOperation=NONE;
+
         emit dbComplete();
     }
 
